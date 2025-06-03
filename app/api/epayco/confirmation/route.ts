@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/epayco/db';
 import { epaycoOrders } from '@/lib/epayco/schema';
-import { eq } from 'drizzle-orm';
+import { eq, sql } from 'drizzle-orm';
 import { mapEpaycoStatus } from '@/lib/epayco/config';
 
 export async function POST(req: NextRequest) {
@@ -31,9 +31,8 @@ export async function POST(req: NextRequest) {
       .set({
         status,
         transactionId,
-        processingDate: new Date(),
-        updatedAt: new Date(),
-
+        processingDate: sql`strftime('%s', 'now')`,
+        updatedAt: sql`strftime('%s', 'now')`,
       })
       .where(eq(epaycoOrders.referenceCode, referenceCode));
 
