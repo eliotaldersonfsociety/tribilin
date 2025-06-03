@@ -1,23 +1,19 @@
+// app/api/epayco/order/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/epayco/db';
 import { epaycoOrders, epaycoOrderItems } from '@/lib/epayco/schema';
 import { eq } from 'drizzle-orm';
 
-export async function GET(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function GET(req: NextRequest) {
   try {
-    const orderId = parseInt(params.id, 10);
+    const { searchParams } = new URL(req.url);
+    const idParam = searchParams.get('id');
 
+    const orderId = parseInt(idParam || '', 10);
     if (isNaN(orderId)) {
-      return NextResponse.json(
-        { error: 'ID de orden inválido' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'ID de orden inválido' }, { status: 400 });
     }
 
-    // Buscar la orden en la base de datos
     const order = await db
       .select()
       .from(epaycoOrders)
@@ -25,20 +21,15 @@ export async function GET(
       .limit(1);
 
     if (!order || order.length === 0) {
-      return NextResponse.json(
-        { error: 'Orden no encontrada' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: 'Orden no encontrada' }, { status: 404 });
     }
 
-    // Buscar los items de la orden
     const orderItems = await db
       .select()
       .from(epaycoOrderItems)
       .where(eq(epaycoOrderItems.orderId, orderId));
 
-    // Construir la respuesta con todos los detalles de la orden
-    const orderDetails = {
+    return NextResponse.json({
       ...order[0],
       items: orderItems.map(item => ({
         id: item.id,
@@ -48,11 +39,9 @@ export async function GET(
         image: item.image || undefined,
         color: item.color || undefined,
         size: item.size || undefined,
-        sizeRange: item.sizeRange || undefined
-      }))
-    };
-
-    return NextResponse.json(orderDetails);
+        sizeRange: item.sizeRange || undefined,
+      })),
+    });
 
   } catch (error) {
     console.error('Error al obtener detalles de la orden:', error);
