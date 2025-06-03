@@ -30,9 +30,13 @@ export const epaycoOrderItems = sqliteTable('epayco_order_items', {
   id: integer('id').primaryKey({ autoIncrement: true }),
   orderId: integer('orderId').notNull(),
   productId: text('productId').notNull(),
-  title: text('title').notNull(),
+  name: text('name').notNull(),
   price: real('price').notNull(),
   quantity: integer('quantity').notNull(),
+  image: text('image'),
+  color: text('color'),
+  size: text('size'),
+  sizeRange: text('sizeRange'),
   createdAt: integer('createdAt', { mode: 'timestamp' }).notNull().defaultNow()
 });
 
