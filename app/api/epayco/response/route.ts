@@ -35,7 +35,7 @@ export async function POST(req: NextRequest) {
     if (order && order.length > 0) {
       switch (status) {
         case EPAYCO_STATUS.APPROVED:
-          redirectUrl = `/order-success?orderId=${order[0].id}&status=approved`;
+          redirectUrl = `/thankyou?orderId=${order[0].id}&status=approved`;
           break;
         case EPAYCO_STATUS.REJECTED:
         case EPAYCO_STATUS.FAILED:
