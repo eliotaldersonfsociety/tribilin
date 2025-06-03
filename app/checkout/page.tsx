@@ -156,7 +156,7 @@ export default function Checkout() {
         phone: cleanPhone,
         address: deliveryInfo.address || '',
         document: cleanDocument,
-        documentType: deliveryInfo.documentType,
+        document_type: deliveryInfo.documentType,
         invoice: Date.now().toString()
       });
 
