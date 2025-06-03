@@ -7,9 +7,7 @@ export const generateReferenceCode = () => {
 };
 
 export const getEpaycoEndpointUrl = (endpoint: 'confirmation' | 'response') => {
-  const baseUrl = EPAYCO_CONFIG.baseUrl?.replace(/\/$/, '');
-  const path = EPAYCO_CONFIG[endpoint]?.replace(/^\//, '');
-  return `${baseUrl}/${path}`;
+  return EPAYCO_CONFIG[endpoint];
 };
 
 export const calculateTaxBase = (amount: number, taxRate: number = 0.19) => {
