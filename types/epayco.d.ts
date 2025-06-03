@@ -1,3 +1,42 @@
+export interface EpaycoHandler {
+  open: (data: EpaycoData) => void;
+}
+
+export interface EpaycoData {
+  //Basic info
+  name: string;
+  description: string;
+  invoice: string;
+  currency: string;
+  amount: number;        // Cambiado a number
+  tax_base: number;      // Cambiado a number
+  tax: number;          // Cambiado a number
+  country: string;
+  lang: string;
+  external: string;
+  response: string;
+  confirmation: string;
+  //Billing info
+  name_billing: string;
+  address_billing: string;
+  type_doc_billing: string;
+  mobilephone_billing: string;
+  number_doc_billing: string;
+  email_billing: string;
+}
+
+declare global {
+  interface Window {
+    ePayco: {
+      checkout: {
+        configure: (config: Epayco.CheckoutConfig) => EpaycoHandler;
+      };
+    };
+  }
+}
+
+export as namespace Epayco;
+
 declare namespace Epayco {
   interface CheckoutConfig {
     key: string;
@@ -37,18 +76,3 @@ declare namespace Epayco {
     error?: string;
   }
 }
-
-declare global {
-  interface Window {
-    ePayco?: {
-      checkout: {
-        configure: (config: Epayco.CheckoutConfig) => {
-          open: (config?: Epayco.CheckoutConfig) => void;
-        };
-      };
-    };
-  }
-}
-
-export = Epayco;
-export as namespace Epayco;
