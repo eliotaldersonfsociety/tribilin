@@ -3,20 +3,7 @@
 import Script from 'next/script';
 import { useEffect } from 'react';
 import { EPAYCO_CONFIG } from '@/lib/epayco/config';
-
-type EpaycoHandler = {
-  open: (data: any) => void;
-};
-
-declare global {
-  interface Window {
-    ePayco: {
-      checkout: {
-        configure: (config: { key: string; test: boolean }) => EpaycoHandler;
-      };
-    };
-  }
-}
+import type { EpaycoHandler, EpaycoData } from '@/types/epayco';
 
 export default function EpaycoScript() {
   useEffect(() => {
@@ -54,7 +41,6 @@ export default function EpaycoScript() {
   return (
     <Script
       src="https://checkout.epayco.co/checkout.js"
-      strategy="afterInteractive"
       onLoad={() => console.log('Script de ePayco cargado')}
       onError={(e) => console.error('Error al cargar el script de ePayco:', e)}
     />
