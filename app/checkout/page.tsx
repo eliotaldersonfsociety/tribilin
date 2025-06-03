@@ -48,16 +48,19 @@ export default function Checkout() {
   });
 
   useEffect(() => {
-    if (!user) {
-      router.push('/sign-in');
-      return;
-    }
-    if (cart.items.length === 0) {
-      toast.info('Tu carrito está vacío');
-      router.push('/');
-      return;
-    }
-  }, []);
+    const checkAuth = async () => {
+      if (!user) {
+        router.push('/sign-in');
+        return;
+      }
+      if (cart.items.length === 0) {
+        toast.info('Tu carrito está vacío');
+        router.push('/');
+        return;
+      }
+    };
+    checkAuth();
+  }, [user, cart.items.length, router]);
 
   const validateDeliveryInfo = () => {
     const errors = [];
