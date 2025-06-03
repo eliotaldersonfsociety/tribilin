@@ -31,8 +31,9 @@ export async function POST(req: NextRequest) {
       .set({
         status,
         transactionId,
-        processingDate: Date.now(),
-        updatedAt: Date.now(),
+        processingDate: new Date(),
+        updatedAt: new Date(),
+
       })
       .where(eq(epaycoOrders.referenceCode, referenceCode));
 
