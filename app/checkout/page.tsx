@@ -55,8 +55,9 @@ export default function Checkout() {
     if (cart.items.length === 0) {
       toast.info('Tu carrito está vacío');
       router.push('/');
+      return;
     }
-  }, [user, router, cart.items.length]);
+  }, []);
 
   const validateDeliveryInfo = () => {
     const errors = [];
