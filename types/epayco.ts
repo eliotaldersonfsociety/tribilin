@@ -1,13 +1,21 @@
 export interface EpaycoData {
   amount: number;
   tax: number;
+  tax_base: number;
   name: string;
   description: string;
-  email: string;
-  phone: string;
-  address: string;
-  document: string;
-  document_type: string;
+  currency: string;
+  country: string;
+  lang: string;
+  external: string;
+  response: string;
+  confirmation: string;
+  name_billing: string;
+  address_billing: string;
+  type_doc_billing: string;
+  mobilephone_billing: string;
+  number_doc_billing: string;
+  email_billing: string;
   invoice: string;
 }
 
@@ -34,7 +42,7 @@ export interface EpaycoHandler {
       mobilephone_billing: string;
       number_doc_billing: string;
     }) => {
-      open: () => void;
+      open: (data: EpaycoData) => void;
     };
   };
 }
