@@ -67,6 +67,7 @@ export async function POST(req: NextRequest) {
       .set({
         status,
         transaction_id,
+        ref_payco: refPayco, // Guardar ref_payco en la base de datos
         updated_at: new Date(),
       })
       .where(eq(epaycoOrders.id, currentOrder.id));
