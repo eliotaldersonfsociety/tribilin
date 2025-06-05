@@ -34,7 +34,7 @@ export async function POST(req: NextRequest) {
         processingDate: sql`strftime('%s', 'now')`,
         updatedAt: sql`strftime('%s', 'now')`,
       })
-      .where(eq(epaycoOrders.referenceCode, referenceCode));
+      .where(eq(epaycoOrders.reference_code, referenceCode)); // Cambiado de referenceCode a reference_code
 
     return NextResponse.json({
       success: true,
