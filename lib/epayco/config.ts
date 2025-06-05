@@ -5,7 +5,7 @@ export const EPAYCO_CONFIG = {
   country: 'CO',
   lang: 'es',
   external: 'true',
-  response: `${process.env.NEXT_PUBLIC_BASE_URL}/thankyou/ok`,
+  response: `${process.env.NEXT_PUBLIC_BASE_URL}/thankyou/ok?invoice={invoice}`,
   confirmation: `${process.env.NEXT_PUBLIC_BASE_URL}/api/epayco/confirmation`,
   name_billing: '',
   description: '',
