@@ -6,6 +6,12 @@ import { epaycoOrders } from '@/lib/epayco/schema';
 import { eq } from 'drizzle-orm';
 import { mapEpaycoStatus, EPAYCO_STATUS } from '@/lib/epayco/config';
 
+// Función para construir URLs absolutas
+function buildAbsoluteUrl(path: string) {
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+  return new URL(path, baseUrl).toString();
+}
+
 // ✅ Manejo del GET para redirección desde ePayco
 export async function GET(req: NextRequest) {
   try {
@@ -13,17 +19,13 @@ export async function GET(req: NextRequest) {
     const refPayco = searchParams.get('ref_payco');
 
     if (!refPayco) {
-      return NextResponse.redirect('/checkout', 302);
+      return NextResponse.redirect(buildAbsoluteUrl('/checkout'), 302);
     }
 
-    // ePayco no nos da toda la info por GET, solo el ref_payco.
-    // Redirigimos a una página donde el frontend puede hacer fetch al backend (con POST, usando x_id_invoice).
-    // Esto asume que ya el webhook de "confirmation" procesó los datos correctamente.
-
-    return NextResponse.redirect(`/thankyou/ok?ref_payco=${refPayco}`, 302);
+    return NextResponse.redirect(buildAbsoluteUrl(`/thankyou/ok?ref_payco=${refPayco}`), 302);
   } catch (error) {
     console.error('Error en GET /api/epayco/response:', error);
-    return NextResponse.redirect('/checkout', 302);
+    return NextResponse.redirect(buildAbsoluteUrl('/checkout'), 302);
   }
 }
 
@@ -48,7 +50,7 @@ export async function POST(req: NextRequest) {
     }
 
     const status = mapEpaycoStatus(transactionState);
-    let redirectUrl = '/checkout';
+    let redirectUrl = buildAbsoluteUrl('/checkout');
 
     const order = await db
       .select()
@@ -67,24 +69,24 @@ export async function POST(req: NextRequest) {
       .set({
         status,
         transaction_id,
-        ref_payco: refPayco, // Guardar ref_payco en la base de datos
+        ref_payco: refPayco,
         updated_at: new Date(),
       })
       .where(eq(epaycoOrders.id, currentOrder.id));
 
     switch (status) {
       case EPAYCO_STATUS.APPROVED:
-        redirectUrl = `/thankyou?orderId=${currentOrder.id}&status=approved`;
+        redirectUrl = buildAbsoluteUrl(`/thankyou?orderId=${currentOrder.id}&status=approved`);
         break;
       case EPAYCO_STATUS.REJECTED:
       case EPAYCO_STATUS.FAILED:
-        redirectUrl = `/order-failed?orderId=${currentOrder.id}&status=failed&reason=${encodeURIComponent(responseText)}`;
+        redirectUrl = buildAbsoluteUrl(`/order-failed?orderId=${currentOrder.id}&status=failed&reason=${encodeURIComponent(responseText)}`);
         break;
       case EPAYCO_STATUS.PENDING:
-        redirectUrl = `/order-pending?orderId=${currentOrder.id}&status=pending`;
+        redirectUrl = buildAbsoluteUrl(`/order-pending?orderId=${currentOrder.id}&status=pending`);
         break;
       default:
-        redirectUrl = '/checkout';
+        redirectUrl = buildAbsoluteUrl('/checkout');
     }
 
     return NextResponse.json({
