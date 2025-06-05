@@ -19,8 +19,8 @@ export const epaycoOrders = sqliteTable('epayco_orders', {
   document_type: text('document_type').notNull(),
   document_number: text('document_number').notNull(),
   processing_date: integer('processing_date'),
-  updated_at: integer('updated_at', { mode: 'timestamp' }).notNull().defaultNow()
-  ref_payco: text('ref_payco'),
+  updated_at: integer('updated_at', { mode: 'timestamp' }).notNull().defaultNow(),
+  ref_payco: text('ref_payco')
 });
 
 export type EpaycoOrder = typeof epaycoOrders.$inferSelect;
