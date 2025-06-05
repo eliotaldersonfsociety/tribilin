@@ -16,6 +16,13 @@ export async function POST(req: NextRequest) {
     const currency = form.get('x_currency_code') as string;
     const test = form.get('x_test_request') as string;
 
+    console.log('Datos recibidos en el webhook de confirmación:', {
+      refPayco,
+      transaction_id,
+      transactionState,
+      reference_code
+    });
+
     if (!reference_code || !transactionState) {
       return NextResponse.json(
         { error: 'Datos de confirmación incompletos' },
@@ -35,6 +42,8 @@ export async function POST(req: NextRequest) {
         updated_at: sql`strftime('%s', 'now')`,
       })
       .where(eq(epaycoOrders.reference_code, reference_code));
+
+    console.log('Orden actualizada con ref_payco:', refPayco);
 
     return NextResponse.json({
       success: true,
