@@ -6,12 +6,34 @@ import { epaycoOrders } from '@/lib/epayco/schema';
 import { eq } from 'drizzle-orm';
 import { mapEpaycoStatus, EPAYCO_STATUS } from '@/lib/epayco/config';
 
+// ✅ Manejo del GET para redirección desde ePayco
+export async function GET(req: NextRequest) {
+  try {
+    const { searchParams } = new URL(req.url);
+    const refPayco = searchParams.get('ref_payco');
+
+    if (!refPayco) {
+      return NextResponse.redirect('/checkout', 302);
+    }
+
+    // ePayco no nos da toda la info por GET, solo el ref_payco.
+    // Redirigimos a una página donde el frontend puede hacer fetch al backend (con POST, usando x_id_invoice).
+    // Esto asume que ya el webhook de "confirmation" procesó los datos correctamente.
+
+    return NextResponse.redirect(`/thankyou/ok?ref_payco=${refPayco}`, 302);
+  } catch (error) {
+    console.error('Error en GET /api/epayco/response:', error);
+    return NextResponse.redirect('/checkout', 302);
+  }
+}
+
+// ✅ POST para cuando recibes datos estructurados desde ePayco (webhook o fetch del frontend)
 export async function POST(req: NextRequest) {
   try {
     const data = await req.json();
 
     const {
-      x_ref_payco: refPayco, // Este es el ID interno de ePayco, solo para logs si lo necesitas
+      x_ref_payco: refPayco,
       x_transaction_id: transaction_id,
       x_transaction_state: transactionState,
       x_id_invoice: reference_code,
@@ -28,7 +50,6 @@ export async function POST(req: NextRequest) {
     const status = mapEpaycoStatus(transactionState);
     let redirectUrl = '/checkout';
 
-    // Buscar la orden por reference_code
     const order = await db
       .select()
       .from(epaycoOrders)
@@ -41,7 +62,6 @@ export async function POST(req: NextRequest) {
 
     const currentOrder = order[0];
 
-    // Actualizar estado de la orden
     await db
       .update(epaycoOrders)
       .set({
@@ -51,7 +71,6 @@ export async function POST(req: NextRequest) {
       })
       .where(eq(epaycoOrders.id, currentOrder.id));
 
-    // Determinar URL de redirección según estado
     switch (status) {
       case EPAYCO_STATUS.APPROVED:
         redirectUrl = `/thankyou?orderId=${currentOrder.id}&status=approved`;
@@ -73,7 +92,7 @@ export async function POST(req: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Error en respuesta de ePayco:', error);
+    console.error('Error en POST /api/epayco/response:', error);
     return NextResponse.json(
       { error: 'Error procesando la respuesta' },
       { status: 500 }
