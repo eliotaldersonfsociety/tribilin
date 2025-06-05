@@ -34,7 +34,7 @@ interface CartItem {
 
 export default function Checkout() {
   const router = useRouter();
-  const { user } = useUser();
+  const { user, isLoaded } = useUser(); // ¡Importante! Usar isLoaded
   const { cart, clearCart } = useCart();
   const { initializeCheckout } = useEpaycoCheckout();
   const [paymentMethod, setPaymentMethod] = useState('epayco');
@@ -50,19 +50,33 @@ export default function Checkout() {
   });
 
   useEffect(() => {
+    // ¡CRÍTICO! Solo ejecutar cuando Clerk esté completamente cargado
+    if (!isLoaded) return;
+
     const checkAuth = async () => {
+      console.log('🔍 Verificando autenticación con Clerk cargado...');
+      
       if (!user) {
+        console.log('❌ Usuario no autenticado, redirigiendo a sign-in');
         router.push('/sign-in');
         return;
       }
+
+      console.log('✅ Usuario autenticado:', user.id);
+      
+      // Solo verificar carrito si el usuario está autenticado
       if (cart.items.length === 0) {
+        console.log('⚠️ Carrito vacío detectado');
         toast.info('Tu carrito está vacío');
         router.push('/');
         return;
       }
+
+      console.log('✅ Carrito tiene productos:', cart.items.length);
     };
+
     checkAuth();
-  }, [user, cart.items.length, router]);
+  }, [isLoaded, user, cart.items.length, router]); // Agregar isLoaded como dependencia
 
   const validateDeliveryInfo = () => {
     const errors = [];
@@ -210,6 +224,19 @@ export default function Checkout() {
     return cart.total + tax + tip;
   };
 
+  // Mostrar loading mientras Clerk se carga
+  if (!isLoaded) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Cargando...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Si no hay usuario después de cargar, no renderizar nada (ya se redirigió)
   if (!user) {
     return null;
   }
