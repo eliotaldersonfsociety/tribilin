@@ -10,12 +10,12 @@ export async function POST(req: NextRequest) {
     const {
       x_ref_payco: transactionId,
       x_transaction_state: transactionState,
-      x_id_invoice: referenceCode,
+      x_id_invoice: reference_code, // Cambiado de referenceCode a reference_code
       x_response: response,
       x_response_reason_text: responseText,
     } = data;
 
-    if (!referenceCode) {
+    if (!reference_code) { // Cambiado de referenceCode a reference_code
       return NextResponse.json(
         { error: 'Referencia no encontrada' },
         { status: 400 }
@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
     const order = await db
       .select()
       .from(epaycoOrders)
-      .where(eq(epaycoOrders.referenceCode, referenceCode))
+      .where(eq(epaycoOrders.reference_code, reference_code)) // Cambiado de referenceCode a reference_code
       .limit(1);
 
     if (order && order.length > 0) {
