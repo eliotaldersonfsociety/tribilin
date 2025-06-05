@@ -143,55 +143,75 @@ export default function Checkout() {
   };
 
   const handleEpaycoPayment = async () => {
-    if (isProcessing) return;
-  
-    try {
-      setIsProcessing(true);
-  
-      // Validar campos requeridos
-      if (!deliveryInfo.name || !deliveryInfo.address || 
-          !deliveryInfo.phone || !deliveryInfo.document || 
-          !deliveryInfo.documentType || !deliveryInfo.city) {
-        toast.error('Por favor complete todos los campos requeridos');
-        setIsProcessing(false);
-        return;
-      }
-  
-      // Validar email
-      if (!user?.emailAddresses[0]?.emailAddress) {
-        toast.error('Se requiere un correo electrónico válido');
-        setIsProcessing(false);
-        return;
-      }
-  
-      const orderResponse = await fetch('/api/epayco/order', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          items: cart.items,
-          deliveryInfo: {
-            ...deliveryInfo,
-            clerk_id: user.id,
-            email: user.emailAddresses[0].emailAddress
-          },
-          total: cart.total,
-          tax: calculateTax()
-        })
-      });
-  
-      if (!orderResponse.ok) {
-        const errorData = await orderResponse.json();
-        throw new Error(errorData.error || 'Error al crear la orden');
-      }
-  
-      // ... resto del código
-    } catch (error) {
-      console.error('Error en pago con ePayco:', error);
-      toast.error(error instanceof Error ? error.message : 'Error al procesar el pago');
-    } finally {
+  if (isProcessing) return;
+
+  try {
+    setIsProcessing(true);
+
+    // Validate required fields
+    if (!deliveryInfo.name || !deliveryInfo.address ||
+        !deliveryInfo.phone || !deliveryInfo.document ||
+        !deliveryInfo.documentType || !deliveryInfo.city) {
+      toast.error('Por favor complete todos los campos requeridos');
       setIsProcessing(false);
+      return;
     }
-  };
+
+    // Validate email
+    if (!user?.emailAddresses[0]?.emailAddress) {
+      toast.error('Se requiere un correo electrónico válido');
+      setIsProcessing(false);
+      return;
+    }
+
+    const orderResponse = await fetch('/api/epayco/order', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        items: cart.items,
+        deliveryInfo: {
+          ...deliveryInfo,
+          clerk_id: user.id,
+          email: user.emailAddresses[0].emailAddress
+        },
+        total: cart.total,
+        tax: calculateTax()
+      })
+    });
+
+    if (!orderResponse.ok) {
+      const errorData = await orderResponse.json();
+      throw new Error(errorData.error || 'Error al crear la orden');
+    }
+
+    const orderData = await orderResponse.json();
+
+    // Initialize ePayco Checkout
+    const success = await initializeCheckout({
+      amount: orderData.amount,
+      tax: orderData.tax,
+      name: deliveryInfo.name,
+      description: 'Pago de pedido',
+      email: user.emailAddresses[0].emailAddress,
+      phone: deliveryInfo.phone,
+      address: deliveryInfo.address,
+      document: deliveryInfo.document,
+      document_type: deliveryInfo.documentType,
+      invoice: orderData.referenceCode
+    });
+
+    if (!success) {
+      throw new Error('Error al inicializar el checkout de ePayco');
+    }
+
+  } catch (error) {
+    console.error('Error en pago con ePayco:', error);
+    toast.error(error instanceof Error ? error.message : 'Error al procesar el pago');
+  } finally {
+    setIsProcessing(false);
+  }
+};
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
