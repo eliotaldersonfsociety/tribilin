@@ -19,7 +19,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Datos de entrega incompletos' }, { status: 400 });
     }
 
-    const { tax_base } = calculateTaxBase(total, tax);
+    // Asegúrate de que el nombre de la propiedad coincida con lo que devuelve calculateTaxBase
+    const { taxBase: tax_base } = calculateTaxBase(total, tax);
 
     // Crear la orden en la base de datos
     const [order] = await db.insert(epaycoOrders).values({
@@ -44,9 +45,9 @@ export async function POST(request: NextRequest) {
 
     // Guardar los items del pedido
     const orderItems = items.map((item: any) => ({
-      order_id: order.id, // Asegúrate de que esta línea coincida con el nombre de la columna
-      product_id: item.id.toString(), // Asegúrate de que esta línea coincida con el nombre de la columna
-      title: item.name, // Asegúrate de que esta línea coincida con el nombre de la columna
+      order_id: order.id,
+      product_id: item.id.toString(),
+      title: item.name,
       price: item.price,
       quantity: item.quantity
     }));
