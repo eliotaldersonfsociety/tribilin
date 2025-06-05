@@ -32,7 +32,8 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { tax_base, tax } = calculateTaxBase(amount);
+    // Adjust the destructuring to match the property names returned by calculateTaxBase
+    const { taxBase: tax_base, tax } = calculateTaxBase(amount);
     const reference_code = generateReferenceCode();
 
     // Crear la orden en la base de datos
@@ -43,7 +44,7 @@ export async function POST(req: NextRequest) {
         clerk_id: userId,
         amount,
         tax,
-        tax_base,
+        tax_base, // Use the renamed variable here
         status: EPAYCO_STATUS.PENDING,
         buyer_email,
         buyer_name,
@@ -60,9 +61,9 @@ export async function POST(req: NextRequest) {
     // Insertar los items de la orden
     await db.insert(epaycoOrderItems).values(
       items.map((item: any) => ({
-        order_id: order.id, // Asegúrate de que esta línea coincida con el nombre de la columna
-        product_id: item.id, // Asegúrate de que esta línea coincida con el nombre de la columna
-        title: item.name, // Asegúrate de que esta línea coincida con el nombre de la columna
+        order_id: order.id,
+        product_id: item.id,
+        title: item.name,
         price: item.price,
         quantity: item.quantity
       }))
