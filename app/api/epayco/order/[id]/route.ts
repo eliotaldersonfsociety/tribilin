@@ -6,8 +6,7 @@ import { eq } from 'drizzle-orm';
 
 export async function GET(req: NextRequest) {
   try {
-    // Extract the orderId from the URL
-    const id = req.url.split('/').pop(); // This gets the last part of the URL
+    const id = req.url.split('/').pop(); // Extract order ID from the URL
     const orderId = parseInt(id || '', 10);
 
     if (isNaN(orderId)) {
@@ -24,14 +23,34 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'Order not found' }, { status: 404 });
     }
 
+    const orderData = order[0];
+
     const orderItems = await db
       .select()
       .from(epaycoOrderItems)
       .where(eq(epaycoOrderItems.order_id, orderId));
 
+    // Adapt the response to match what the frontend expects
     return NextResponse.json({
-      ...order[0],
-      items: orderItems,
+      id: orderData.id,
+      referenceCode: orderData.reference_code,
+      amount: orderData.amount,
+      tax: orderData.tax,
+      tip: 0, // Cambia esto si usas propina
+      shipping_address: orderData.shipping_address,
+      shipping_city: orderData.shipping_city,
+      shipping_country: orderData.shipping_country,
+      phone: orderData.phone,
+      items: orderItems.map(item => ({
+        id: item.id,
+        name: item.title,
+        quantity: item.quantity,
+        price: item.price,
+        image: '', // Si tienes imagen en el carrito, deberías guardarla también
+        color: '', // Opcional
+        size: '',  // Opcional
+        sizeRange: '', // Opcional
+      })),
     });
 
   } catch (error) {
