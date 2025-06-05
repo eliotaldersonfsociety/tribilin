@@ -18,6 +18,7 @@ interface DeliveryInfo {
   phone: string;
   document: string;
   documentType: string;
+  city: string;
 }
 
 interface CartItem {
@@ -45,6 +46,7 @@ export default function Checkout() {
     phone: '',
     document: '',
     documentType: 'CC',
+    city: ''
   });
 
   useEffect(() => {
@@ -132,7 +134,22 @@ export default function Checkout() {
     try {
       setIsProcessing(true);
   
-      // Crear la orden primero
+      // Validar campos requeridos
+      if (!deliveryInfo.name || !deliveryInfo.address || 
+          !deliveryInfo.phone || !deliveryInfo.document || 
+          !deliveryInfo.documentType || !deliveryInfo.city) {
+        toast.error('Por favor complete todos los campos requeridos');
+        setIsProcessing(false);
+        return;
+      }
+  
+      // Validar email
+      if (!user?.emailAddresses[0]?.emailAddress) {
+        toast.error('Se requiere un correo electrónico válido');
+        setIsProcessing(false);
+        return;
+      }
+  
       const orderResponse = await fetch('/api/epayco/order', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -140,8 +157,8 @@ export default function Checkout() {
           items: cart.items,
           deliveryInfo: {
             ...deliveryInfo,
-            clerk_id: user?.id,
-            email: user?.emailAddresses[0]?.emailAddress
+            clerk_id: user.id,
+            email: user.emailAddresses[0].emailAddress
           },
           total: cart.total,
           tax: calculateTax()
@@ -149,28 +166,14 @@ export default function Checkout() {
       });
   
       if (!orderResponse.ok) {
-        throw new Error('Error al crear la orden');
+        const errorData = await orderResponse.json();
+        throw new Error(errorData.error || 'Error al crear la orden');
       }
   
-      const { orderId, referenceCode } = await orderResponse.json();
-  
-      // Iniciar el pago con ePayco
-      await initializeCheckout({
-        amount: cart.total,
-        tax: calculateTax(),
-        name: deliveryInfo.name || '',
-        description: `Orden #${orderId}`,
-        email: user?.emailAddresses[0]?.emailAddress?.toLowerCase() || '',
-        phone: deliveryInfo.phone || '',
-        address: deliveryInfo.address || '',
-        document: deliveryInfo.document || '',
-        document_type: deliveryInfo.documentType || 'CC',
-        invoice: referenceCode
-      });
-  
+      // ... resto del código
     } catch (error) {
       console.error('Error en pago con ePayco:', error);
-      toast.error('Error al procesar el pago. Por favor, intenta de nuevo.');
+      toast.error(error instanceof Error ? error.message : 'Error al procesar el pago');
     } finally {
       setIsProcessing(false);
     }
