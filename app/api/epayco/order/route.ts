@@ -18,7 +18,16 @@ interface CartItem {
 export async function POST(request: NextRequest) {
   try {
     const { items, deliveryInfo, total, tax } = await request.json();
+    console.log('Datos recibidos:', { items, deliveryInfo, total, tax });
+
     const referenceCode = generateReferenceCode();
+    console.log('Código de referencia generado:', referenceCode);
+
+    // Validar datos requeridos
+    if (!deliveryInfo || !deliveryInfo.email || !deliveryInfo.name || !deliveryInfo.address || !deliveryInfo.phone || !deliveryInfo.documentType || !deliveryInfo.document) {
+      console.error('Datos de entrega incompletos');
+      return NextResponse.json({ error: 'Datos de entrega incompletos' }, { status: 400 });
+    }
 
     // Crear la orden en la base de datos
     const [order] = await db.insert(epaycoOrders).values({
@@ -37,24 +46,27 @@ export async function POST(request: NextRequest) {
       documentNumber: deliveryInfo.document
     }).returning();
 
+    console.log('Orden creada:', order);
+
     // Guardar los items del pedido
-    await db.insert(epaycoOrderItems).values(
-      items.map((item: CartItem) => ({
-        orderId: order.id,
-        productId: item.id.toString(),
-        name: item.name,
-        price: item.price,
-        quantity: item.quantity,
-        image: item.image,
-        color: item.color,
-        size: item.size,
-        sizeRange: item.sizeRange
-      }))
-    );
+    const orderItems = items.map((item: CartItem) => ({
+      orderId: order.id,
+      productId: item.id.toString(),
+      name: item.name,
+      price: item.price,
+      quantity: item.quantity,
+      image: item.image,
+      color: item.color,
+      size: item.size,
+      sizeRange: item.sizeRange
+    }));
+
+    await db.insert(epaycoOrderItems).values(orderItems);
+    console.log('Ítems de la orden guardados');
 
     return NextResponse.json({ orderId: order.id, referenceCode });
   } catch (error) {
-    console.error('Error creating order:', error);
-    return NextResponse.json({ error: 'Error creating order' }, { status: 500 });
+    console.error('Error creando la orden:', error);
+    return NextResponse.json({ error: 'Error creando la orden', details: error instanceof Error ? error.message : 'Error desconocido' }, { status: 500 });
   }
 }
