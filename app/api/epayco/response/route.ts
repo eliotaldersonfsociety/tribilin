@@ -33,6 +33,7 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const data = await req.json();
+    console.log('Datos recibidos:', data); // Log para verificar los datos recibidos
 
     const {
       x_ref_payco: refPayco,
@@ -64,15 +65,18 @@ export async function POST(req: NextRequest) {
 
     const currentOrder = order[0];
 
+    // Actualizar la orden en la base de datos
     await db
       .update(epaycoOrders)
       .set({
         status,
         transaction_id,
-        ref_payco: refPayco,
+        ref_payco: refPayco, // Guardar ref_payco
         updated_at: new Date(),
       })
       .where(eq(epaycoOrders.id, currentOrder.id));
+
+    console.log('Orden actualizada con ref_payco:', refPayco); // Log para verificar que se guardó ref_payco
 
     switch (status) {
       case EPAYCO_STATUS.APPROVED:
