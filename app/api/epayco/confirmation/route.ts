@@ -8,15 +8,15 @@ export async function POST(req: NextRequest) {
   try {
     const data = await req.json();
     const {
-      x_ref_payco: transactionId,
+      x_ref_payco: transaction_id,
       x_transaction_state: transactionState,
-      x_id_invoice: referenceCode,
+      x_id_invoice: reference_code,
       x_amount: amount,
       x_currency_code: currency,
       x_test_request: test,
     } = data;
 
-    if (!referenceCode || !transactionState) {
+    if (!reference_code || !transactionState) {
       return NextResponse.json(
         { error: 'Datos de confirmación incompletos' },
         { status: 400 }
@@ -30,11 +30,11 @@ export async function POST(req: NextRequest) {
       .update(epaycoOrders)
       .set({
         status,
-        transactionId,
-        processingDate: sql`strftime('%s', 'now')`,
-        updatedAt: sql`strftime('%s', 'now')`,
+        transaction_id,
+        processing_date: sql`strftime('%s', 'now')`,
+        updated_at: sql`strftime('%s', 'now')`,
       })
-      .where(eq(epaycoOrders.reference_code, referenceCode)); // Cambiado de referenceCode a reference_code
+      .where(eq(epaycoOrders.reference_code, reference_code));
 
     return NextResponse.json({
       success: true,
