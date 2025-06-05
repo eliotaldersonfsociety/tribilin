@@ -15,14 +15,14 @@ export async function POST(req: NextRequest) {
     const {
       amount,
       items,
-      buyerEmail,
-      buyerName,
-      shippingAddress,
-      shippingCity,
-      shippingCountry,
+      buyer_email,
+      buyer_name,
+      shipping_address,
+      shipping_city,
+      shipping_country,
       phone,
-      documentType,
-      documentNumber,
+      document_type,
+      document_number,
     } = await req.json();
 
     if (!amount || !items || items.length === 0) {
@@ -32,37 +32,37 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { taxBase, tax } = calculateTaxBase(amount);
-    const reference_code = generateReferenceCode(); // Cambiado de referenceCode a reference_code
+    const { tax_base, tax } = calculateTaxBase(amount);
+    const reference_code = generateReferenceCode();
 
     // Crear la orden en la base de datos
     const [order] = await db
       .insert(epaycoOrders)
       .values({
-        reference_code, // Cambiado de referenceCode a reference_code
+        reference_code,
         clerk_id: userId,
         amount,
         tax,
-        taxBase,
+        tax_base,
         status: EPAYCO_STATUS.PENDING,
-        buyerEmail,
-        buyerName,
-        shippingAddress,
-        shippingCity,
-        shippingCountry,
+        buyer_email,
+        buyer_name,
+        shipping_address,
+        shipping_city: shipping_city || 'N/A',
+        shipping_country: shipping_country || 'CO',
         phone,
-        documentType,
-        documentNumber,
-        processingDate: Date.now()
+        document_type,
+        document_number,
+        processing_date: Date.now()
       })
       .returning();
 
     // Insertar los items de la orden
     await db.insert(epaycoOrderItems).values(
       items.map((item: any) => ({
-        orderId: order.id,
-        productId: item.id,
-        title: item.name,
+        order_id: order.id, // Asegúrate de que esta línea coincida con el nombre de la columna
+        product_id: item.id, // Asegúrate de que esta línea coincida con el nombre de la columna
+        title: item.name, // Asegúrate de que esta línea coincida con el nombre de la columna
         price: item.price,
         quantity: item.quantity
       }))
@@ -71,7 +71,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({
       success: true,
       orderId: order.id,
-      referenceCode: order.reference_code // Cambiado de referenceCode a reference_code
+      referenceCode: order.reference_code
     });
 
   } catch (error) {
