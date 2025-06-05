@@ -33,13 +33,13 @@ export async function POST(req: NextRequest) {
     }
 
     const { taxBase, tax } = calculateTaxBase(amount);
-    const referenceCode = generateReferenceCode();
+    const reference_code = generateReferenceCode(); // Cambiado de referenceCode a reference_code
 
     // Crear la orden en la base de datos
     const [order] = await db
       .insert(epaycoOrders)
       .values({
-        referenceCode,
+        reference_code, // Cambiado de referenceCode a reference_code
         clerk_id: userId,
         amount,
         tax,
@@ -71,7 +71,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({
       success: true,
       orderId: order.id,
-      referenceCode: order.referenceCode
+      referenceCode: order.reference_code // Cambiado de referenceCode a reference_code
     });
 
   } catch (error) {
