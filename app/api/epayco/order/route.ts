@@ -55,7 +55,7 @@ export async function POST(request: NextRequest) {
     await db.insert(epaycoOrderItems).values(orderItems);
     console.log('Ítems de la orden guardados');
 
-    return NextResponse.json({ orderId: order.id, referenceCode: order.reference_code });
+    return NextResponse.json({ orderId: order.id, referenceCode: order.reference_code, amount: Number(order.amount), tax: Number(order.tax) });
 
   } catch (error) {
     console.error('Error creando la orden:', error);
