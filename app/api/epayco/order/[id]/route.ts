@@ -1,12 +1,15 @@
-// app/api/epayco/order/[orderId]/route.ts
+// app/api/epayco/order/[id]/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/epayco/db';
 import { epaycoOrders, epaycoOrderItems } from '@/lib/epayco/schema';
 import { eq } from 'drizzle-orm';
 
-export async function GET(req: NextRequest, { params }: { params: { orderId: string } }) {
+export async function GET(req: NextRequest) {
   try {
-    const orderId = parseInt(params.orderId, 10);
+    // Extract the orderId from the URL
+    const id = req.url.split('/').pop(); // This gets the last part of the URL
+    const orderId = parseInt(id || '', 10);
+
     if (isNaN(orderId)) {
       return NextResponse.json({ error: 'Invalid order ID' }, { status: 400 });
     }
