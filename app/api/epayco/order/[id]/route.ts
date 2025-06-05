@@ -27,19 +27,16 @@ export async function GET(req: NextRequest) {
     const orderItems = await db
       .select()
       .from(epaycoOrderItems)
-      .where(eq(epaycoOrderItems.orderId, orderId));
+      .where(eq(epaycoOrderItems.order_id, orderId)); // Updated to match schema
 
     return NextResponse.json({
       ...order[0],
       items: orderItems.map(item => ({
         id: item.id,
-        name: item.name,
-        quantity: item.quantity,
+        product_id: item.product_id, // Updated to match schema
+        title: item.title, // Updated to match schema
         price: item.price,
-        image: item.image || undefined,
-        color: item.color || undefined,
-        size: item.size || undefined,
-        sizeRange: item.sizeRange || undefined,
+        quantity: item.quantity,
       })),
     });
 
