@@ -6,15 +6,14 @@ import { mapEpaycoStatus } from '@/lib/epayco/config';
 
 export async function POST(req: NextRequest) {
   try {
-    const data = await req.json();
-    const {
-      x_ref_payco: transaction_id,
-      x_transaction_state: transactionState,
-      x_id_invoice: reference_code,
-      x_amount: amount,
-      x_currency_code: currency,
-      x_test_request: test,
-    } = data;
+    const form = await req.formData(); // ✅ cambia esto
+
+    const transaction_id = form.get('x_ref_payco') as string;
+    const transactionState = form.get('x_transaction_state') as string;
+    const reference_code = form.get('x_id_invoice') as string;
+    const amount = form.get('x_amount') as string;
+    const currency = form.get('x_currency_code') as string;
+    const test = form.get('x_test_request') as string;
 
     if (!reference_code || !transactionState) {
       return NextResponse.json(
@@ -25,7 +24,6 @@ export async function POST(req: NextRequest) {
 
     const status = mapEpaycoStatus(transactionState);
 
-    // Actualizar el estado de la orden
     await db
       .update(epaycoOrders)
       .set({
