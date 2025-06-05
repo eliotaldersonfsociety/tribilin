@@ -2,7 +2,7 @@ import { sqliteTable, text, integer, real } from 'drizzle-orm/sqlite-core';
 
 export const epaycoOrders = sqliteTable('epayco_orders', {
   id: integer('id').primaryKey({ autoIncrement: true }),
-  referenceCode: text('referenceCode').notNull().unique(),
+  reference_code: text('reference_code').notNull().unique(),
   clerk_id: text('clerk_id').notNull(),
   amount: real('amount').notNull(),
   tax: real('tax').notNull(),
