@@ -1,3 +1,4 @@
+// schema.ts
 import { sqliteTable, text, integer, real } from 'drizzle-orm/sqlite-core';
 
 export const epaycoOrders = sqliteTable('epayco_orders', {
@@ -6,21 +7,19 @@ export const epaycoOrders = sqliteTable('epayco_orders', {
   clerk_id: text('clerk_id').notNull(),
   amount: real('amount').notNull(),
   tax: real('tax').notNull(),
-  taxBase: real('taxBase').notNull(),
-  currency: text('currency').notNull().default('COP'),
+  tax_base: real('tax_base').notNull(),
   status: text('status').notNull().default('PENDING'),
-  transactionId: text('transactionId'),
-  processingDate: integer('processingDate'),
-  buyerEmail: text('buyerEmail').notNull(),
-  buyerName: text('buyerName').notNull(),
-  shippingAddress: text('shippingAddress').notNull(),
-  shippingCity: text('shippingCity').notNull(),
-  shippingCountry: text('shippingCountry').notNull(),
+  transaction_id: text('transaction_id'),
+  buyer_email: text('buyer_email').notNull(),
+  buyer_name: text('buyer_name').notNull(),
+  shipping_address: text('shipping_address').notNull(),
+  shipping_city: text('shipping_city').notNull(),
+  shipping_country: text('shipping_country').notNull(),
   phone: text('phone').notNull(),
-  documentType: text('documentType').notNull(),
-  documentNumber: text('documentNumber').notNull(),
-  createdAt: integer('createdAt', { mode: 'timestamp' }).notNull().defaultNow(),
-  updatedAt: integer('updatedAt', { mode: 'timestamp' }).notNull().defaultNow()
+  document_type: text('document_type').notNull(),
+  document_number: text('document_number').notNull(),
+  processing_date: integer('processing_date'),
+  updated_at: integer('updated_at', { mode: 'timestamp' }).notNull().defaultNow()
 });
 
 export type EpaycoOrder = typeof epaycoOrders.$inferSelect;
@@ -28,16 +27,11 @@ export type NewEpaycoOrder = typeof epaycoOrders.$inferInsert;
 
 export const epaycoOrderItems = sqliteTable('epayco_order_items', {
   id: integer('id').primaryKey({ autoIncrement: true }),
-  orderId: integer('orderId').notNull(),
-  productId: text('productId').notNull(),
-  name: text('name').notNull(),
+  order_id: integer('order_id').notNull(), // Asegúrate de que esta línea coincida con el nombre de la columna
+  product_id: text('product_id').notNull(), // Asegúrate de que esta línea coincida con el nombre de la columna
+  title: text('title').notNull(), // Asegúrate de que esta línea coincida con el nombre de la columna
   price: real('price').notNull(),
-  quantity: integer('quantity').notNull(),
-  image: text('image'),
-  color: text('color'),
-  size: text('size'),
-  sizeRange: text('sizeRange'),
-  createdAt: integer('createdAt', { mode: 'timestamp' }).notNull().defaultNow()
+  quantity: integer('quantity').notNull()
 });
 
 export type EpaycoOrderItem = typeof epaycoOrderItems.$inferSelect;
