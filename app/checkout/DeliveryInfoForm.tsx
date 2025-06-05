@@ -14,6 +14,7 @@ interface DeliveryInfo {
   phone: string;
   document: string;
   documentType: string;
+  city: string;
 }
 
 interface DeliveryInfoFormProps {
@@ -53,6 +54,19 @@ export const DeliveryInfoForm: React.FC<DeliveryInfoFormProps> = ({
                 type="text"
                 name="address"
                 value={deliveryInfo.address}
+                onChange={handleDeliveryInfoChange}
+                className="w-full p-2 border rounded"
+                disabled={isProcessing}
+                required
+              />
+            </div>
+            // Agregar dentro del div.space-y-4
+            <div>
+              <label className="block mb-2">Ciudad</label>
+              <input
+                type="text"
+                name="city"
+                value={deliveryInfo.city}
                 onChange={handleDeliveryInfoChange}
                 className="w-full p-2 border rounded"
                 disabled={isProcessing}
