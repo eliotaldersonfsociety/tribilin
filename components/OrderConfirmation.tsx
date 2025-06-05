@@ -12,15 +12,10 @@ import { useUser } from "@clerk/nextjs";
 import useRoleRedirect from "@/hooks/useOrganization";
 
 interface ShippingAddress {
-  firstname: string;
-  lastname: string;
   address: string;
-  apartment: string;
   city: string;
-  province: string;
-  postal: string;
+  country: string;
   phone: string;
-  country: string | string[];
 }
 
 interface OrderItem {
@@ -61,12 +56,17 @@ export default function OrderConfirmation() {
       try {
         const response = await fetch(`/api/epayco/order/${orderIdParam}`);
         if (!response.ok) throw new Error('Failed to fetch order details');
-        
+
         const orderData = await response.json();
-        
+
         setOrderItems(orderData.items || []);
-        setAddress(orderData.shippingAddress || null);
-        setTotal(orderData.total || 0);
+        setAddress({
+          address: orderData.shipping_address,
+          city: orderData.shipping_city,
+          country: orderData.shipping_country,
+          phone: orderData.phone,
+        });
+        setTotal(orderData.amount || 0);
         setTax(orderData.tax || 0);
         setTip(orderData.tip || 0);
         setOrderId(orderData.id || null);
@@ -102,7 +102,6 @@ export default function OrderConfirmation() {
           <Skeleton width={250} height={24} className="mt-2" />
         </div>
         <div className="grid md:grid-cols-2 gap-8">
-          {/* Left Column Skeleton */}
           <div>
             <Card className="mb-8">
               <CardHeader>
@@ -110,17 +109,8 @@ export default function OrderConfirmation() {
               </CardHeader>
               <CardContent>
                 <Skeleton count={3} height={20} className="mb-2" />
-                <div className="rounded-md overflow-hidden border border-gray-200 mt-4">
-                  <div className="bg-gray-100 p-2 text-sm text-gray-600">
-                    <Skeleton width={200} height={20} />
-                  </div>
-                  <div className="relative w-full h-48">
-                    <Skeleton height="100%" />
-                  </div>
-                </div>
               </CardContent>
             </Card>
-            {/* Details Skeleton */}
             <div>
               <Skeleton width={200} height={24} className="mb-4" />
               <div className="space-y-6">
@@ -145,7 +135,6 @@ export default function OrderConfirmation() {
               </div>
             </div>
           </div>
-          {/* Right Column Skeleton */}
           <div>
             <Card>
               <CardHeader>
@@ -153,7 +142,6 @@ export default function OrderConfirmation() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-6">
-                  {/* Item Skeletons */}
                   {Array.from({ length: 3 }).map((_, index) => (
                     <div key={index} className="border-b pb-4 mb-4 last:border-b-0 last:pb-0">
                       <div className="flex justify-between mb-2">
@@ -163,31 +151,30 @@ export default function OrderConfirmation() {
                       <div className="flex items-center space-x-4">
                         <Skeleton circle width={100} height={100} />
                         <div>
-                          <Skeleton width={150} height={20} className="mb-1"/>
-                          <Skeleton width={100} height={20} className="mb-1"/>
-                          <Skeleton width={100} height={20} className="mb-1"/>
+                          <Skeleton width={150} height={20} className="mb-1" />
+                          <Skeleton width={100} height={20} className="mb-1" />
+                          <Skeleton width={100} height={20} className="mb-1" />
                           <Skeleton width={100} height={20} />
                         </div>
                       </div>
                     </div>
                   ))}
                   <Separator />
-                  {/* Cost Summary Skeletons */}
                   <div className="space-y-2">
-                    <Skeleton width={150} height={20} className="mb-4"/>
+                    <Skeleton width={150} height={20} className="mb-4" />
                     <div className="flex justify-between">
                       <Skeleton width={100} height={20} />
                       <Skeleton width={100} height={20} />
                     </div>
-                     <div className="flex justify-between">
+                    <div className="flex justify-between">
                       <Skeleton width={100} height={20} />
                       <Skeleton width={100} height={20} />
                     </div>
-                     <div className="flex justify-between">
+                    <div className="flex justify-between">
                       <Skeleton width={100} height={20} />
                       <Skeleton width={100} height={20} />
                     </div>
-                     <div className="flex justify-between">
+                    <div className="flex justify-between">
                       <Skeleton width={100} height={20} />
                       <Skeleton width={100} height={20} />
                     </div>
@@ -200,7 +187,7 @@ export default function OrderConfirmation() {
                 </div>
               </CardContent>
             </Card>
-            <Skeleton width={"100%"} height={50} className="mt-4"/>
+            <Skeleton width={"100%"} height={50} className="mt-4" />
           </div>
         </div>
       </div>
@@ -230,9 +217,7 @@ export default function OrderConfirmation() {
               {address ? (
                 <>
                   <p>{address.address}</p>
-                  {address.apartment && <p>{address.apartment}</p>}
-                  <p>{address.city}, {address.province} {address.postal}</p>
-                  <p>{address.country}</p>
+                  <p>{address.city}, {address.country}</p>
                   <p>{address.phone}</p>
                 </>
               ) : (
@@ -248,7 +233,7 @@ export default function OrderConfirmation() {
                 <h3 className="font-medium mb-2">Información de contacto</h3>
                 <p>{user?.firstName || 'No disponible'}</p>
                 <p>{user?.lastName || 'No disponible'}</p>
-                <p>{user?.emailAddresses[0]?.emailAddress || 'No disponible'}</p>
+                <p>{user?.emailAddresses?.[0]?.emailAddress || 'No disponible'}</p>
                 <p>{address?.phone || 'Sin número de teléfono'}</p>
               </div>
               <Separator />
@@ -257,9 +242,7 @@ export default function OrderConfirmation() {
                 {address ? (
                   <>
                     <p>{address.address}</p>
-                    {address.apartment && <p>{address.apartment}</p>}
-                    <p>{address.city}, {address.province} {address.postal}</p>
-                    <p>{address.country}</p>
+                    <p>{address.city}, {address.country}</p>
                     <p>{address.phone}</p>
                   </>
                 ) : (
@@ -307,9 +290,7 @@ export default function OrderConfirmation() {
                     <p className="font-medium">${item.price.toFixed(2)}</p>
                   </div>
                 ))}
-
                 <Separator className="my-4" />
-
                 <div className="space-y-2">
                   <div className="flex justify-between">
                     <p className="text-gray-600">Subtotal</p>
