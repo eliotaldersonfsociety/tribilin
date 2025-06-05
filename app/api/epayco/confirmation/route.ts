@@ -7,7 +7,8 @@ import { mapEpaycoStatus } from '@/lib/epayco/config';
 export async function POST(req: NextRequest) {
   try {
     const form = await req.formData(); // ✅ cambia esto
-
+    
+    const refPayco = form.get('x_ref_payco') as string;
     const transaction_id = form.get('x_ref_payco') as string;
     const transactionState = form.get('x_transaction_state') as string;
     const reference_code = form.get('x_id_invoice') as string;
@@ -29,6 +30,7 @@ export async function POST(req: NextRequest) {
       .set({
         status,
         transaction_id,
+        ref_payco: refPayco,
         processing_date: sql`strftime('%s', 'now')`,
         updated_at: sql`strftime('%s', 'now')`,
       })
