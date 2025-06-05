@@ -1,11 +1,14 @@
+// app/api/epayco/by-transaction/[transaction_id]/route.ts
+
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/epayco/db';
 import { epaycoOrders, epaycoOrderItems } from '@/lib/epayco/schema';
 import { eq } from 'drizzle-orm';
 
-export async function GET(req: NextRequest, { params }: { params: { transaction_id: string } }) {
+export async function GET(req: NextRequest) {
   try {
-    const transactionId = params.transaction_id;
+    // Extraer el transaction_id de la URL
+    const transactionId = req.url.split('/').pop();
 
     if (!transactionId) {
       return NextResponse.json({ error: 'Transaction ID faltante' }, { status: 400 });
