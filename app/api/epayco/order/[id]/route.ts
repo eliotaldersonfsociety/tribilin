@@ -1,17 +1,14 @@
-// app/api/epayco/order/route.ts
+// app/api/epayco/order/[orderId]/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/epayco/db';
 import { epaycoOrders, epaycoOrderItems } from '@/lib/epayco/schema';
 import { eq } from 'drizzle-orm';
 
-export async function GET(req: NextRequest) {
+export async function GET(req: NextRequest, { params }: { params: { orderId: string } }) {
   try {
-    const { searchParams } = new URL(req.url);
-    const idParam = searchParams.get('id');
-
-    const orderId = parseInt(idParam || '', 10);
+    const orderId = parseInt(params.orderId, 10);
     if (isNaN(orderId)) {
-      return NextResponse.json({ error: 'ID de orden inválido' }, { status: 400 });
+      return NextResponse.json({ error: 'Invalid order ID' }, { status: 400 });
     }
 
     const order = await db
@@ -21,29 +18,23 @@ export async function GET(req: NextRequest) {
       .limit(1);
 
     if (!order || order.length === 0) {
-      return NextResponse.json({ error: 'Orden no encontrada' }, { status: 404 });
+      return NextResponse.json({ error: 'Order not found' }, { status: 404 });
     }
 
     const orderItems = await db
       .select()
       .from(epaycoOrderItems)
-      .where(eq(epaycoOrderItems.order_id, orderId)); // Updated to match schema
+      .where(eq(epaycoOrderItems.order_id, orderId));
 
     return NextResponse.json({
       ...order[0],
-      items: orderItems.map(item => ({
-        id: item.id,
-        product_id: item.product_id, // Updated to match schema
-        title: item.title, // Updated to match schema
-        price: item.price,
-        quantity: item.quantity,
-      })),
+      items: orderItems,
     });
 
   } catch (error) {
-    console.error('Error al obtener detalles de la orden:', error);
+    console.error('Error fetching order details:', error);
     return NextResponse.json(
-      { error: 'Error al obtener detalles de la orden' },
+      { error: 'Error fetching order details' },
       { status: 500 }
     );
   }
