@@ -149,9 +149,7 @@ export default function Checkout() {
     setIsProcessing(true);
 
     // Validate required fields
-    if (!deliveryInfo.name || !deliveryInfo.address ||
-        !deliveryInfo.phone || !deliveryInfo.document ||
-        !deliveryInfo.documentType || !deliveryInfo.city) {
+    if (!deliveryInfo.name || !deliveryInfo.address || !deliveryInfo.phone || !deliveryInfo.document || !deliveryInfo.documentType || !deliveryInfo.city) {
       toast.error('Por favor complete todos los campos requeridos');
       setIsProcessing(false);
       return;
@@ -185,11 +183,20 @@ export default function Checkout() {
     }
 
     const orderData = await orderResponse.json();
+    console.log('Order Data:', orderData);
+
+    // Validate and format the amount
+    const formattedAmount = parseFloat(orderData.amount);
+    console.log('Formatted Amount:', formattedAmount);
+    
+    if (isNaN(formattedAmount) || formattedAmount <= 0) {
+      throw new Error('El monto de la orden no es válido');
+    }
 
     // Initialize ePayco Checkout
     const success = await initializeCheckout({
-      amount: orderData.amount,
-      tax: orderData.tax,
+      amount: formattedAmount,
+      tax: parseFloat(orderData.tax),
       name: deliveryInfo.name,
       description: 'Pago de pedido',
       email: user.emailAddresses[0].emailAddress,
@@ -211,6 +218,7 @@ export default function Checkout() {
     setIsProcessing(false);
   }
 };
+
 
 
   const handleSubmit = async (e: React.FormEvent) => {
