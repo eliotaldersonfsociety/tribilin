@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
 
     // Crear la orden en la base de datos
     const [order] = await db.insert(epaycoOrders).values({
-      referenceCode,
+      reference_code: referenceCode, // Cambiado de referenceCode a reference_code
       clerk_id: deliveryInfo.clerk_id,
       amount: total,
       tax: tax || 0,
