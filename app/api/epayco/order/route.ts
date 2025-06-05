@@ -2,26 +2,16 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/epayco/db';
 import { epaycoOrders, epaycoOrderItems } from '@/lib/epayco/schema';
-import { generateReferenceCode } from '@/lib/epayco/utils';
-
-interface CartItem {
-  id: string;
-  name: string;
-  price: number;
-  quantity: number;
-  image?: string | string[];
-  color?: string;
-  size?: string;
-  sizeRange?: string;
-}
+import { generateReferenceCode, calculateTaxBase } from '@/lib/epayco/utils';
+import { EPAYCO_STATUS } from '@/lib/epayco/config';
 
 export async function POST(request: NextRequest) {
   try {
     const { items, deliveryInfo, total, tax } = await request.json();
     console.log('Datos recibidos:', { items, deliveryInfo, total, tax });
 
-    const referenceCode = generateReferenceCode();
-    console.log('Código de referencia generado:', referenceCode);
+    const reference_code = generateReferenceCode();
+    console.log('Código de referencia generado:', reference_code);
 
     // Validar datos requeridos
     if (!deliveryInfo || !deliveryInfo.email || !deliveryInfo.name || !deliveryInfo.address || !deliveryInfo.phone || !deliveryInfo.documentType || !deliveryInfo.document) {
@@ -29,42 +19,43 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Datos de entrega incompletos' }, { status: 400 });
     }
 
+    const { tax_base } = calculateTaxBase(total, tax);
+
     // Crear la orden en la base de datos
     const [order] = await db.insert(epaycoOrders).values({
-      reference_code: referenceCode, // Cambiado de referenceCode a reference_code
+      reference_code,
       clerk_id: deliveryInfo.clerk_id,
       amount: total,
       tax: tax || 0,
-      taxBase: total - (tax || 0),
-      buyerEmail: deliveryInfo.email,
-      buyerName: deliveryInfo.name,
-      shippingAddress: deliveryInfo.address,
-      shippingCity: deliveryInfo.city || 'N/A',
-      shippingCountry: 'CO',
+      tax_base: tax_base,
+      status: EPAYCO_STATUS.PENDING,
+      buyer_email: deliveryInfo.email,
+      buyer_name: deliveryInfo.name,
+      shipping_address: deliveryInfo.address,
+      shipping_city: deliveryInfo.city || 'N/A',
+      shipping_country: 'CO',
       phone: deliveryInfo.phone,
-      documentType: deliveryInfo.documentType,
-      documentNumber: deliveryInfo.document
+      document_type: deliveryInfo.documentType,
+      document_number: deliveryInfo.document,
+      processing_date: Date.now()
     }).returning();
 
     console.log('Orden creada:', order);
 
     // Guardar los items del pedido
-    const orderItems = items.map((item: CartItem) => ({
-      orderId: order.id,
-      productId: item.id.toString(),
-      name: item.name,
+    const orderItems = items.map((item: any) => ({
+      order_id: order.id, // Asegúrate de que esta línea coincida con el nombre de la columna
+      product_id: item.id.toString(), // Asegúrate de que esta línea coincida con el nombre de la columna
+      title: item.name, // Asegúrate de que esta línea coincida con el nombre de la columna
       price: item.price,
-      quantity: item.quantity,
-      image: item.image,
-      color: item.color,
-      size: item.size,
-      sizeRange: item.sizeRange
+      quantity: item.quantity
     }));
 
     await db.insert(epaycoOrderItems).values(orderItems);
     console.log('Ítems de la orden guardados');
 
-    return NextResponse.json({ orderId: order.id, referenceCode });
+    return NextResponse.json({ orderId: order.id, referenceCode: order.reference_code });
+
   } catch (error) {
     console.error('Error creando la orden:', error);
     return NextResponse.json({ error: 'Error creando la orden', details: error instanceof Error ? error.message : 'Error desconocido' }, { status: 500 });
