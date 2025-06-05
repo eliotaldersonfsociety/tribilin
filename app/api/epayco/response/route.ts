@@ -18,6 +18,8 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const refPayco = searchParams.get('ref_payco');
 
+     console.log('ref_payco recibido en GET:', refPayco);
+
     if (!refPayco) {
       return NextResponse.redirect(buildAbsoluteUrl('/checkout'), 302);
     }
@@ -99,7 +101,7 @@ export async function POST(req: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Error en POST /api/epayco/response:', error);
+    console.error('Error en GET /api/epayco/response:', error);
     return NextResponse.json(
       { error: 'Error procesando la respuesta' },
       { status: 500 }
