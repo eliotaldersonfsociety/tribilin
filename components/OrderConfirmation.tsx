@@ -38,7 +38,6 @@ export default function OrderConfirmation() {
   const [loading, setLoading] = useState(true);
   const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
   const [address, setAddress] = useState<ShippingAddress | null>(null);
-  const [total, setTotal] = useState(0);
   const [tax, setTax] = useState(0);
   const [tip, setTip] = useState(0);
   const [orderId, setOrderId] = useState<string | null>(null);
@@ -91,6 +90,11 @@ export default function OrderConfirmation() {
       roleRedirect();
     }, 2000);
   };
+
+  const calculateTotal = () => {
+    return calculateSubtotal() + tax + tip;
+  };
+
 
   if (loading || !isLoaded) {
     return (
@@ -325,7 +329,7 @@ export default function OrderConfirmation() {
                   <Separator className="my-2" />
                   <div className="flex justify-between font-medium">
                     <p>Total</p>
-                    <p>${total.toFixed(2)}</p>
+                    <p>${calculateTotal().toFixed(2)}</p>
                   </div>
                 </div>
               </div>
