@@ -71,6 +71,7 @@ export default function OrderConfirmation() {
         setTip(Number(orderData.tip) || 0);
         setOrderId(orderData.id || null);
         setReferenceCode(orderData.referenceCode || null);
+        setStatus(statusParam);
       } catch (error) {
         console.error('Error fetching order details:', error);
       } finally {
