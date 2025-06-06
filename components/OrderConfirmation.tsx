@@ -2,7 +2,7 @@
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { CheckCircle, XCircle, Clock } from 'lucide-react';
+import { CheckCircle, CircleX, Clock } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Button } from "@/components/ui/button";
@@ -214,13 +214,13 @@ export default function OrderConfirmation() {
           </>
         ) : status === 'pending' ? (
           <>
-            <CheckCircle className="w-16 h-16 text-yellow-500 mb-2" />
+            <Clock className="w-16 h-16 text-yellow-500 mb-2" />
             <h1 className="text-3xl font-bold mb-2">Transacción Pendiente</h1>
             <p className="text-gray-600">Estamos verificando tu pago</p>
           </>
         ) : (
           <>
-            <CheckCircle className="w-16 h-16 text-red-500 mb-2" />
+            <XCircle className="w-16 h-16 text-red-500 mb-2" />
             <h1 className="text-3xl font-bold mb-2">Transacción Fallida</h1>
             <p className="text-gray-600">Tu pedido no pudo ser procesado</p>
           </>
