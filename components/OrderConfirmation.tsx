@@ -222,9 +222,6 @@ export default function OrderConfirmation() {
             <p className="text-gray-600">Tu pedido no pudo ser procesado</p>
           </>
         )}
-
-        <p className="text-lg text-gray-600 mb-1">¡Gracias, {user?.firstName || 'cliente'}!</p>
-        <p className="text-gray-600">Tu pedido está confirmado</p>
         {referenceCode && (
           <p className="text-sm text-gray-500 mt-2">Confirmación N°{referenceCode}</p>
         )}
