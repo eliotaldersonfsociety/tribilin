@@ -219,6 +219,20 @@ export default function OrderConfirmation() {
                   <p>{address.address}</p>
                   <p>{address.city}, {address.country}</p>
                   <p>{address.phone}</p>
+          
+                  {/* Mapa de Google Maps */}
+                  <div className="mt-4 w-full h-64 rounded overflow-hidden border">
+                    <iframe
+                      src={`https://www.google.com/maps?q=${encodeURIComponent(`${address.address}, ${address.city}, ${address.country}`)}&output=embed`}
+                      width="100%"
+                      height="100%"
+                      style={{ border: 0 }}
+                      allowFullScreen
+                      loading="lazy"
+                      referrerPolicy="no-referrer-when-downgrade"
+                      title="Mapa de entrega"
+                    ></iframe>
+                  </div>
                 </>
               ) : (
                 <p>No disponible</p>
