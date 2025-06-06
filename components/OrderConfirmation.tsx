@@ -42,6 +42,8 @@ export default function OrderConfirmation() {
   const [tip, setTip] = useState(0);
   const [orderId, setOrderId] = useState<string | null>(null);
   const [referenceCode, setReferenceCode] = useState<string | null>(null);
+  const [status, setStatus] = useState<string>('pending');
+
 
   useEffect(() => {
     const fetchOrderDetails = async () => {
