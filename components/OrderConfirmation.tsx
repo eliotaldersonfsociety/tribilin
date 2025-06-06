@@ -42,7 +42,6 @@ export default function OrderConfirmation() {
   const [tip, setTip] = useState(0);
   const [orderId, setOrderId] = useState<string | null>(null);
   const [referenceCode, setReferenceCode] = useState<string | null>(null);
-  const [status, setStatus] = useState('approved');
 
   useEffect(() => {
     const fetchOrderDetails = async () => {
@@ -60,6 +59,8 @@ export default function OrderConfirmation() {
 
         const orderData = await response.json();
 
+        setStatus(orderData.status || 'pending');
+
         setOrderItems(orderData.items || []);
         setAddress({
           address: orderData.shipping_address,
@@ -71,7 +72,6 @@ export default function OrderConfirmation() {
         setTip(Number(orderData.tip) || 0);
         setOrderId(orderData.id || null);
         setReferenceCode(orderData.referenceCode || null);
-        setStatus(statusParam);
       } catch (error) {
         console.error('Error fetching order details:', error);
       } finally {
