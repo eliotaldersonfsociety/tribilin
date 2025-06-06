@@ -173,7 +173,8 @@ export default function Checkout() {
           email: user.emailAddresses[0].emailAddress
         },
         total: cart.total,
-        tax: calculateTax()
+        tax: calculateTax(),
+        tip: calculateTip()
       })
     });
 
