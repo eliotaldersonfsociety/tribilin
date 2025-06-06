@@ -7,8 +7,8 @@ import { EPAYCO_STATUS } from '@/lib/epayco/config';
 
 export async function POST(request: NextRequest) {
   try {
-    const { items, deliveryInfo, total, tax } = await request.json();
-    console.log('Datos recibidos:', { items, deliveryInfo, total, tax });
+    const { items, deliveryInfo, total, tax, tip } = await request.json();
+    console.log('Datos recibidos:', { items, deliveryInfo, total, tax, tip });
 
     const reference_code = generateReferenceCode();
     console.log('Código de referencia generado:', reference_code);
@@ -28,6 +28,7 @@ export async function POST(request: NextRequest) {
       clerk_id: deliveryInfo.clerk_id,
       amount: total,
       tax: tax || 0,
+      tip: tip || 0,
       tax_base: tax_base,
       status: EPAYCO_STATUS.PENDING,
       buyer_email: deliveryInfo.email,
