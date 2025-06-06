@@ -12,6 +12,7 @@ import { useUser } from "@clerk/nextjs";
 import useRoleRedirect from "@/hooks/useOrganization";
 
 interface ShippingAddress {
+  name: string;
   address: string;
   city: string;
   country: string;
@@ -216,6 +217,7 @@ export default function OrderConfirmation() {
             <CardContent>
               {address ? (
                 <>
+                  <p>{address.name}</p>
                   <p>{address.address}</p>
                   <p>{address.city}, {address.country}</p>
                   <p>{address.phone}</p>
@@ -241,6 +243,7 @@ export default function OrderConfirmation() {
                 <h3 className="font-medium mb-2">Dirección de envío</h3>
                 {address ? (
                   <>
+                    <p>{address.}</p>
                     <p>{address.address}</p>
                     <p>{address.city}, {address.country}</p>
                     <p>{address.phone}</p>
