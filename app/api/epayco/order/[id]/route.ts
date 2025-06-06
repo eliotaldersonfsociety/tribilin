@@ -35,7 +35,7 @@ export async function GET(req: NextRequest) {
       id: orderData.id,
       referenceCode: orderData.reference_code,
       amount: orderData.amount,
-      status: orderData.satus,
+      status: orderData.status,
       tax: orderData.tax,
       tip: orderData.tip || 0,
       shipping_address: orderData.shipping_address,
