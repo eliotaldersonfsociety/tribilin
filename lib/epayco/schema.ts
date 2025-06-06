@@ -8,6 +8,7 @@ export const epaycoOrders = sqliteTable('epayco_orders', {
   amount: real('amount').notNull(),
   tax: real('tax').notNull(),
   tax_base: real('tax_base').notNull(),
+  tip: real('tip').notNull().default(0), // 👈 AÑADE ESTA LÍNEA
   status: text('status').notNull().default('PENDING'),
   transaction_id: text('transaction_id'),
   buyer_email: text('buyer_email').notNull(),
