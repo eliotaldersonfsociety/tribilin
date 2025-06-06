@@ -46,10 +46,10 @@ export async function GET(req: NextRequest) {
         name: item.title,
         quantity: item.quantity,
         price: item.price,
-        image: '', // Si tienes imagen en el carrito, deberías guardarla también
-        color: '', // Opcional
-        size: '',  // Opcional
-        sizeRange: '', // Opcional
+        image: item.image || '',
+        color: item.color || '',
+        size: item.size || '',
+        sizeRange: item.size_range || '',
       })),
     });
 
