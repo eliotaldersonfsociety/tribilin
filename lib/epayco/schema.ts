@@ -33,7 +33,11 @@ export const epaycoOrderItems = sqliteTable('epayco_order_items', {
   product_id: text('product_id').notNull(), // Asegúrate de que esta línea coincida con el nombre de la columna
   title: text('title').notNull(), // Asegúrate de que esta línea coincida con el nombre de la columna
   price: real('price').notNull(),
-  quantity: integer('quantity').notNull()
+  quantity: integer('quantity').notNull(),
+  image: text('image'),       
+  color: text('color'),       
+  size: text('size'),         
+  size_range: text('size_range') 
 });
 
 export type EpaycoOrderItem = typeof epaycoOrderItems.$inferSelect;
