@@ -50,7 +50,11 @@ export async function POST(request: NextRequest) {
       product_id: item.id.toString(),
       title: item.name,
       price: item.price,
-      quantity: item.quantity
+      quantity: item.quantity,
+      image: item.image || '',
+      color: item.color || '',
+      size: item.size || '',
+      size_range: item.sizeRange?.toString() || ''
     }));
 
     await db.insert(epaycoOrderItems).values(orderItems);
