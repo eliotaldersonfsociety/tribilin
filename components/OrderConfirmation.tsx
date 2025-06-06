@@ -65,7 +65,6 @@ export default function OrderConfirmation() {
           country: orderData.shipping_country,
           phone: orderData.phone,
         });
-        setTotal(orderData.amount || 0);
         setTax(orderData.tax || 0);
         setTip(orderData.tip || 0);
         setOrderId(orderData.id || null);
