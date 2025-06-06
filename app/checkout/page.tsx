@@ -298,6 +298,14 @@ export default function Checkout() {
               tipAmount={tipAmount}
               setTipAmount={setTipAmount}
             />
+
+            <button
+              type="submit"
+              className="w-full bg-blue-600 text-white py-3 px-4 rounded hover:bg-blue-700 disabled:bg-blue-300 cursor-pointer disabled:cursor-not-allowed"
+              disabled={isProcessing || cart.items.length === 0 || !isDeliveryInfoValid()}
+            >
+              {isProcessing ? 'Procesando...' : 'Realizar Pago'}
+            </button>
           </form>
         </div>
 
@@ -310,14 +318,6 @@ export default function Checkout() {
           currency="COP"
         />
       </div>
-      <button
-        type="submit"
-        className="w-full bg-blue-600 text-white py-3 px-4 rounded hover:bg-blue-700 disabled:bg-blue-300 cursor-pointer disabled:cursor-not-allowed"
-        disabled={isProcessing || cart.items.length === 0}
-        onClick={handleSubmit}
-      >
-        {isProcessing ? 'Procesando...' : 'Realizar Pago'}
-      </button>
     </div>
   );
 }
