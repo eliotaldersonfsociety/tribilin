@@ -66,7 +66,7 @@ export default function OrderConfirmation() {
           phone: orderData.phone,
         });
         setTax(orderData.tax || 0);
-        setTip(orderData.tip || 0);
+        setTip(Number(orderData.tip) || 0);
         setOrderId(orderData.id || null);
         setReferenceCode(orderData.referenceCode || null);
       } catch (error) {
