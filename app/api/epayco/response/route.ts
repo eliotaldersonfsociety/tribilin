@@ -114,7 +114,7 @@ export async function POST(req: NextRequest) {
 
     switch (status) {
       case EPAYCO_STATUS.APPROVED:
-        redirectUrl = buildAbsoluteUrl(`/thankyou?orderId=${currentOrder.id}&status=approved`);
+        redirectUrl = buildAbsoluteUrl(`/thankyou?orderId=${currentOrder.id}&status=${currentOrder.status}`);
         break;
       case EPAYCO_STATUS.REJECTED:
       case EPAYCO_STATUS.FAILED:
