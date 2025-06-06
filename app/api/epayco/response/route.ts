@@ -18,18 +18,50 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const refPayco = searchParams.get('ref_payco');
 
-     console.log('ref_payco recibido en GET:', refPayco);
+    console.log('ref_payco recibido en GET:', refPayco);
 
     if (!refPayco) {
       return NextResponse.redirect(buildAbsoluteUrl('/checkout'), 302);
     }
 
-    return NextResponse.redirect(buildAbsoluteUrl(`/thankyou/ok?ref_payco=${refPayco}`), 302);
+    // 👉 Llamar a la API de validación de ePayco
+    const epaycoResponse = await fetch(`https://secure.epayco.co/validation/v1/reference/${refPayco}`);
+    const epaycoData = await epaycoResponse.json();
+
+    if (!epaycoData.success) {
+      console.error('Error de ePayco:', epaycoData);
+      return NextResponse.redirect(buildAbsoluteUrl('/checkout'), 302);
+    }
+
+    const referenceCode = epaycoData.data?.x_id_invoice;
+    if (!referenceCode) {
+      console.error('No se obtuvo reference_code desde ePayco');
+      return NextResponse.redirect(buildAbsoluteUrl('/checkout'), 302);
+    }
+
+    // 👉 Buscar orden en DB por reference_code
+    const order = await db
+      .select()
+      .from(epaycoOrders)
+      .where(eq(epaycoOrders.reference_code, referenceCode))
+      .limit(1);
+
+    if (!order || order.length === 0) {
+      console.error('Orden no encontrada en DB');
+      return NextResponse.redirect(buildAbsoluteUrl('/checkout'), 302);
+    }
+
+    const currentOrder = order[0];
+
+    // ✅ Redirigir a thankyou con el verdadero orderId
+    return NextResponse.redirect(buildAbsoluteUrl(`/thankyou?orderId=${currentOrder.id}`), 302);
+
   } catch (error) {
     console.error('Error en GET /api/epayco/response:', error);
     return NextResponse.redirect(buildAbsoluteUrl('/checkout'), 302);
   }
 }
+
 
 // ✅ POST para cuando recibes datos estructurados desde ePayco (webhook o fetch del frontend)
 export async function POST(req: NextRequest) {
