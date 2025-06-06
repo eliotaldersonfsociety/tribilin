@@ -36,7 +36,7 @@ export async function GET(req: NextRequest) {
       referenceCode: orderData.reference_code,
       amount: orderData.amount,
       tax: orderData.tax,
-      tip: 0, // Cambia esto si usas propina
+      tip: orderData.tip || 0,
       shipping_address: orderData.shipping_address,
       shipping_city: orderData.shipping_city,
       shipping_country: orderData.shipping_country,
