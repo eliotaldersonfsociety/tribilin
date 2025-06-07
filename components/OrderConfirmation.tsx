@@ -203,14 +203,14 @@ export default function OrderConfirmation() {
   return (
     <div className="container mx-auto py-12 px-4 max-w-6xl">
       <div className="flex flex-col items-center text-center mb-8">
-        {status === 'approved' ? (
+        {status === 'APPROVED' ? (
           <>
             <CheckCircle className="w-16 h-16 text-green-500 mb-2" />
             <h1 className="text-3xl font-bold mb-2">Transacción Aprobada</h1>
             <p className="text-lg text-gray-600 mb-1">¡Gracias, {user?.firstName || 'cliente'}!</p>
             <p className="text-gray-600">Tu pedido está confirmado</p>
           </>
-        ) : status === 'pending' ? (
+        ) : status === 'PENDING' ? (
           <>
             <Clock className="w-16 h-16 text-yellow-500 mb-2" />
             <h1 className="text-3xl font-bold mb-2">Transacción Pendiente</h1>
