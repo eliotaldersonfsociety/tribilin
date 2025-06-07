@@ -48,7 +48,7 @@ export default function OrderConfirmation() {
   useEffect(() => {
     const fetchOrderDetails = async () => {
       const orderIdParam = searchParams.get('orderId');
-      const statusParam = searchParams.get('status') || 'approved';
+      const statusParam = searchParams.get('status');
       if (!orderIdParam) {
         console.error('No order ID provided');
         setLoading(false);
@@ -57,12 +57,10 @@ export default function OrderConfirmation() {
 
       try {
         const response = await fetch(`/api/epayco/order/${orderIdParam}`);
-        if (!response.ok) throw new Error('Failed to fetch order details');
-
         const orderData = await response.json();
 
-        setStatus(orderData.status || 'pending');
-
+        setStatus(statusParam || orderData.status || 'pending');
+        
         setOrderItems(orderData.items || []);
         setAddress({
           address: orderData.shipping_address,
