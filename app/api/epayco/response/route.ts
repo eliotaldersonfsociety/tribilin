@@ -64,7 +64,7 @@ export async function GET(req: NextRequest) {
 
 
     // ✅ Redirigir a thankyou con el verdadero orderId
-    return NextResponse.redirect(buildAbsoluteUrl(`/thankyou?orderId=${currentOrder.id}&status=${status}`), 302);
+    return NextResponse.redirect(buildAbsoluteUrl(`/thankyou?orderId=${currentOrder.id}&status=${status.toLowerCase()}`), 302);
 
   } catch (error) {
     console.error('Error en GET /api/epayco/response:', error);
