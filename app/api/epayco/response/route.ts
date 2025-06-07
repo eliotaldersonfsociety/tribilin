@@ -53,8 +53,18 @@ export async function GET(req: NextRequest) {
 
     const currentOrder = order[0];
 
+    // ✅ Extrae el estado de ePayco y actualiza la orden
+    const transactionState = epaycoData.data?.x_transaction_state;
+    const status = mapEpaycoStatus(transactionState);
+
+    await db
+      .update(epaycoOrders)
+      .set({ status })
+      .where(eq(epaycoOrders.reference_code, referenceCode));
+
+
     // ✅ Redirigir a thankyou con el verdadero orderId
-    return NextResponse.redirect(buildAbsoluteUrl(`/thankyou?orderId=${currentOrder.id}`), 302);
+    return NextResponse.redirect(buildAbsoluteUrl(`/thankyou?orderId=${currentOrder.id}&status=${status}`), 302);
 
   } catch (error) {
     console.error('Error en GET /api/epayco/response:', error);
