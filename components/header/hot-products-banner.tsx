@@ -134,7 +134,7 @@ export default function HotProductsBanner() {
     <div className="w-full">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center justify-center w-full py-1.5 text-sm font-medium bg-gradient-to-r from-red-600 to-orange-500 text-white hover:from-red-700 hover:to-orange-600 transition-colors duration-200"
+        className="flex items-center justify-center w-full py-1.5 text-sm font-medium bg-gradient-to-r from-green-600 to-green-500 text-white hover:from-red-700 hover:to-orange-600 transition-colors duration-200"
       >
         <Flame className="h-4 w-4 mr-2 text-white" />
         Lo más hot
