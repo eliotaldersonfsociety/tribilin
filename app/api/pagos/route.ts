@@ -9,25 +9,59 @@ import { sql } from 'drizzle-orm'; // Importamos sql para tipos numéricos en SQ
 
 export async function POST(request: NextRequest) {
   try {
+    console.log('1. Iniciando solicitud POST /api/pagos');
+
     const body = await request.json();
+    console.log('2. Cuerpo de la solicitud:', body);
+
     const { productos, total } = body;
+
+    if (!productos || !Array.isArray(productos)) {
+      console.error('⚠️ Productos no válidos:', productos);
+      return NextResponse.json({ error: "Productos no proporcionados o formato incorrecto" }, { status: 400 });
+    }
+
+    if (typeof total !== 'number' || isNaN(total)) {
+      console.error('⚠️ Total no válido:', total);
+      return NextResponse.json({ error: "Total no válido" }, { status: 400 });
+    }
 
     // Obtener usuario autenticado
     const { userId } = await getAuth(request);
-    if (!userId) return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+    console.log('3. Usuario autenticado:', userId);
+
+    if (!userId) {
+      console.warn('❌ No autorizado: usuario no autenticado');
+      return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+    }
 
     // Buscar usuario
     const userResult = await db.users.select().from(users).where(eq(users.clerk_id, userId));
-    if (!userResult.length) return NextResponse.json({ error: "Usuario no encontrado" }, { status: 404 });
+    console.log('4. Resultado de búsqueda de usuario:', userResult);
+
+    if (!userResult.length) {
+      console.warn('❌ Usuario no encontrado:', userId);
+      return NextResponse.json({ error: "Usuario no encontrado" }, { status: 404 });
+    }
 
     const currentSaldo = Number(userResult[0].saldo);
-    if (currentSaldo < total) return NextResponse.json({ error: "Saldo insuficiente" }, { status: 400 });
+    console.log('5. Saldo actual del usuario:', currentSaldo);
+    console.log('   Total requerido:', total);
+
+    if (currentSaldo < total) {
+      console.warn('❌ Saldo insuficiente para realizar el pago');
+      return NextResponse.json({ error: "Saldo insuficiente" }, { status: 400 });
+    }
 
     // Verificar stock
+    console.log('6. Verificando stock...');
     for (const producto of productos) {
       const prodArr = await db.products.select().from(products).where(eq(products.id, producto.id));
       const prod = prodArr[0];
+      console.log(`   Producto ${producto.id}:`, prod);
+
       if (!prod || prod.quantity < producto.quantity) {
+        console.warn(`❌ Stock insuficiente para ${producto.name}`);
         return NextResponse.json({ error: `Stock insuficiente para ${producto.name}` }, { status: 400 });
       }
     }
@@ -36,12 +70,17 @@ export async function POST(request: NextRequest) {
     try {
       // 1. Actualizar saldo
       const newBalance = currentSaldo - total;
+      console.log('7. Actualizando saldo a:', newBalance);
+
       await db.users.update(users)
         .set({ saldo: newBalance.toString() })
         .where(eq(users.clerk_id, userId));
 
+      console.log('8. Saldo actualizado correctamente');
+
       // 2. Generar código de referencia
       const referenceCode = `SALDO_${Date.now().toString()}`;
+      console.log('9. Código de referencia generado:', referenceCode);
 
       // 3. Calcular campos obligatorios
       const buyerName = body.name || `${userResult[0].first_name} ${userResult[0].last_name}`.trim();
@@ -49,7 +88,16 @@ export async function POST(request: NextRequest) {
       const documentType = body.documentType || 'CC';
       const documentNumber = body.document || '';
 
+      console.log('10. Campos obligatorios calculados:', {
+        buyerName,
+        buyerEmail,
+        documentType,
+        documentNumber
+      });
+
       // 4. Insertar en epayco_orders y devolver el ID generado
+      console.log('11. Insertando orden en ePayco...');
+
       const [inserted] = await db.epayco.insert(epaycoOrders)
         .values({
           reference_code: referenceCode,
@@ -74,12 +122,20 @@ export async function POST(request: NextRequest) {
         })
         .returning({ id: epaycoOrders.id }); // ✅ Obtiene el ID directamente
 
-      const insertedId = inserted.id;
+      const insertedId = inserted?.id;
+      console.log('12. Orden insertada con ID:', insertedId);
+
+      if (!insertedId) {
+        throw new Error('No se pudo obtener el ID de la orden insertada');
+      }
 
       // 5. Insertar items en epayco_order_items
+      console.log('13. Insertando items de la orden...');
+
       for (const producto of productos) {
         const prodArr = await db.products.select().from(products).where(eq(products.id, producto.id));
         const prod = prodArr[0];
+
         await db.epayco.insert(epaycoOrderItems).values({
           order_id: insertedId,
           product_id: producto.id.toString(),
@@ -91,16 +147,25 @@ export async function POST(request: NextRequest) {
           size: producto.size || '',
           size_range: producto.sizeRange || '',
         });
+
+        console.log(`   Item insertado: ${producto.id} - ${producto.name}`);
       }
 
       // 6. Actualizar stock
+      console.log('14. Actualizando stock...');
+
       for (const producto of productos) {
         const prodArr = await db.products.select().from(products).where(eq(products.id, producto.id));
         const prod = prodArr[0];
+
         await db.products.update(products)
           .set({ quantity: prod.quantity - producto.quantity })
           .where(eq(products.id, producto.id));
+
+        console.log(`   Stock actualizado para producto: ${producto.id}`);
       }
+
+      console.log('✅ Pago procesado exitosamente');
 
       return NextResponse.json({
         success: true,
@@ -111,12 +176,12 @@ export async function POST(request: NextRequest) {
       });
 
     } catch (error) {
-      console.error('Error en transacción:', error);
+      console.error('🚨 Error en transacción:', error);
       throw error;
     }
 
   } catch (error: any) {
-    console.error('Error al procesar la transacción:', error);
+    console.error('💥 Error general en API:', error);
     return NextResponse.json(
       { error: 'Error al procesar la transacción', details: error?.message || 'Error desconocido' },
       { status: 500 }
