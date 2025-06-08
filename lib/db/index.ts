@@ -45,8 +45,8 @@ const visitasClient = createClient({
 });
 
 const epaycoClient = createClient({
-  url: process.env.EPAYCO_DB_URL!, // Define esta variable en .env
-  authToken: process.env.EPAYCO_DB_TOKEN
+  url: process.env.TURSO_URL!, // Define esta variable en .env
+  authToken: process.env.TURSO_AUTH_TOKEN
 });
 
 // Instancias de Drizzle con sus respectivos esquemas
