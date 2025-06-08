@@ -121,9 +121,14 @@ export default function Checkout() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          items: cart.items,
+          productos: cart.items,
           total: cart.total,
-          deliveryInfo,
+          address: deliveryInfo.address,
+          city: deliveryInfo.city,
+          name: deliveryInfo.name,
+          phone: deliveryInfo.phone,
+          document: deliveryInfo.document,
+          documentType: deliveryInfo.documentType,
         }),
       });
 
