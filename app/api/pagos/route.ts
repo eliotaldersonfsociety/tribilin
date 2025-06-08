@@ -9,7 +9,7 @@ import { getAuth } from '@clerk/nextjs/server';
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { productos, total, type } = body;
+    const { productos, total } = body;
 
     // Obtener usuario autenticado
     const { userId } = await getAuth(request);
@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
 
     // Procesar transacción
     try {
-      // 1. Actualizar saldo (en usuarios DB)
+      // 1. Actualizar saldo
       const newBalance = currentSaldo - total;
       await db.users.update(users).set({ saldo: newBalance.toString() }).where(eq(users.clerk_id, userId));
 
@@ -46,8 +46,8 @@ export async function POST(request: NextRequest) {
       const documentType = body.documentType || 'CC';
       const documentNumber = body.document || '';
 
-      // 4. Insertar en epayco_orders (sin `id`)
-      const [insertedOrder] = await db.epayco.insert(epaycoOrders).values({
+      // 4. Insertar en epayco_orders (sin `.returning()`)
+      await db.epayco.insert(epaycoOrders).values({
         reference_code: referenceCode,
         clerk_id: userId,
         amount: total,
@@ -63,21 +63,21 @@ export async function POST(request: NextRequest) {
         buyer_name: buyerName,
         document_type: documentType,
         document_number: documentNumber,
-        processing_date: Math.floor(Date.now() / 1000), // número UNIX timestamp
-        //updated_at: new Date(),
+        processing_date: Math.floor(Date.now() / 1000),
+        updated_at: Math.floor(Date.now() / 1000),
         transaction_id: null,
         ref_payco: null,
       });
 
-      //4.1 Obtener el id generado con last
-      const insertedId = await db.epayco.lastInsertRowid();
+      // 5. Obtener el ID generado con `lastInsertRowid()`
+      const insertedId = await db.epayco.lastInsertRowid(); // ✅ ID generado
 
-      // 5. Insertar items en epayco_order_items (usando `id` devuelto)
+      // 6. Insertar items en epayco_order_items
       for (const producto of productos) {
         const prodArr = await db.products.select().from(products).where(eq(products.id, producto.id));
         const prod = prodArr[0];
         await db.epayco.insert(epaycoOrderItems).values({
-          order_id: insertedId, // ✅ Usamos el ID devuelto por la base de datos
+          order_id: insertedId, // ✅ ID obtenido con `lastInsertRowid()`
           product_id: producto.id.toString(),
           title: producto.name,
           price: producto.price,
@@ -89,7 +89,7 @@ export async function POST(request: NextRequest) {
         });
       }
 
-      // 6. Actualizar stock (en usuarios DB)
+      // 7. Actualizar stock
       for (const producto of productos) {
         const prodArr = await db.products.select().from(products).where(eq(products.id, producto.id));
         const prod = prodArr[0];
@@ -101,10 +101,11 @@ export async function POST(request: NextRequest) {
         message: 'Pago procesado',
         newBalance: newBalance.toString(),
         orderId: insertedId.toString(), // ✅ Devuelve el ID generado
-        referenceCode: referenceCode,
+        referenceCode: referenceCode
       });
 
     } catch (error) {
+      console.error('Error en transacción:', error);
       throw error;
     }
 
