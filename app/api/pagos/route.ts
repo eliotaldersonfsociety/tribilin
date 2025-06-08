@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import db from '@/lib/db';
-import { users, products, epaycoOrders, epaycoOrderItems } from '@/lib/usuarios/schema';
+import { epaycoOrders, epaycoOrderItems } from '@/lib/epayco/schema';
+import { users, products } from '@/lib/usuarios/schema';
 import { eq } from 'drizzle-orm';
 import { z } from 'zod';
 import { getAuth } from '@clerk/nextjs/server';
