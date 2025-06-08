@@ -3,29 +3,12 @@ import db from '@/lib/db/index';
 import { epaycoOrders, epaycoOrderItems } from '@/lib/epayco/schema';
 import { users, products } from '@/lib/usuarios/schema';
 import { eq } from 'drizzle-orm';
-import { z } from 'zod';
 import { getAuth } from '@clerk/nextjs/server';
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-
-    // Validación con Zod
-    const pagoSchema = z.object({
-      productos: z.array(z.object({
-        id: z.number(),
-        name: z.string(),
-        quantity: z.number().int().positive(),
-      })),
-      total: z.number().positive(),
-      type: z.string().optional(),
-    });
-    const parseResult = pagoSchema.safeParse(body);
-    if (!parseResult.success) {
-      return NextResponse.json({ error: 'Datos inválidos en el pago', detalles: parseResult.error.errors }, { status: 400 });
-    }
-
-    const { productos, total, type } = parseResult.data;
+    const { productos, total, type } = body;
 
     // Obtener usuario autenticado con Clerk
     const { userId } = getAuth(request);
