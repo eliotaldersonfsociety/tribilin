@@ -93,7 +93,7 @@ export async function POST(request: NextRequest) {
       const documentNumber = body.document || '';
 
       // 4. Insertar en epaycoOrders
-      await db.insert(epaycoOrders).values({
+      await db.epayco.insert(epaycoOrders).values({
         id: orderId,
         reference_code: referenceCode,
         clerk_id: userId,
@@ -124,7 +124,7 @@ export async function POST(request: NextRequest) {
           .where(eq(products.id, producto.id));
         const prod = prodArr[0];
 
-        await db.insert(epaycoOrderItems).values({
+        await db.epayco.insert(epaycoOrderItems).values({
           order_id: orderId,
           product_id: producto.id.toString(),
           title: producto.name,
