@@ -97,7 +97,7 @@ export async function POST(request: NextRequest) {
       for (const producto of productos) {
         const prodArr = await db.products.select().from(products).where(eq(products.id, producto.id));
         const prod = prodArr[0];
-        await db.update(products)
+        await db.products.update(products)
           .set({ quantity: prod.quantity - producto.quantity })
           .where(eq(products.id, producto.id));
       }
