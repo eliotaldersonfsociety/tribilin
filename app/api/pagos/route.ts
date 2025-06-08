@@ -50,7 +50,7 @@ export async function POST(request: NextRequest) {
       const documentNumber = body.document || '';
 
       // 4. Insertar en epayco_orders y devolver el ID generado
-      const [inserted] = await db.insert(epaycoOrders)
+      const [inserted] = await db.epayco.inset(epaycoOrders)
         .values({
           reference_code: referenceCode,
           clerk_id: userId,
