@@ -6,6 +6,7 @@ import * as productsSchema from '@/lib/products/schema';
 import * as transactionsSchema from '@/lib/transaction/schema';
 import * as visitasSchema from '@/lib/visitas/schema';
 import * as orders from '@/lib/payu/schema';
+import * as epaycoSchema from '@/lib/epayco/schema';
 import { eq } from 'drizzle-orm';
 import * as bcrypt from 'bcrypt';
 import { productsTable } from "@/lib/products/schema";
@@ -43,12 +44,22 @@ const visitasClient = createClient({
   authToken: process.env.VISITAS_DB_TOKEN
 });
 
+const epaycoClient = createClient({
+  url: process.env.EPAYCO_DB_URL!, // Define esta variable en .env
+  authToken: process.env.EPAYCO_DB_TOKEN
+});
+
 // Instancias de Drizzle con sus respectivos esquemas
 const productsDb = drizzle(productsClient);
 const usersDb = drizzle(usersClient);
 const transactionsDb = drizzle(transactionsClient);
 const payuDb = drizzle(payuClient);
 const visitasDb = drizzle(visitasClient);
+const epaycoDb = drizzle(epaycoClient, {
+  schema: {
+    epaycoOrders: epaycoSchema.epaycoOrders,
+    epaycoOrderItems: epaycoSchema.epaycoOrderItems
+  }
 
 export const db = {
   products: productsDb,
@@ -58,6 +69,7 @@ export const db = {
   payu: payuDb,
   payus: transactionsDb,
   visitas: visitasDb,
+  epayco: epaycoDb
 } as const;
 
 export type DB = typeof db;
