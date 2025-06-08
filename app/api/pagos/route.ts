@@ -80,7 +80,7 @@ export async function POST(request: NextRequest) {
       for (const producto of productos) {
         const prodArr = await db.products.select().from(products).where(eq(products.id, producto.id));
         const prod = prodArr[0];
-        await db.insert(epaycoOrderItems).values({
+        await db.apyco.insert(epaycoOrderItems).values({
           order_id: insertedId,
           product_id: producto.id.toString(),
           title: producto.name,
