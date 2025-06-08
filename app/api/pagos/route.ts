@@ -64,7 +64,7 @@ export async function POST(request: NextRequest) {
         document_type: documentType,
         document_number: documentNumber,
         processing_date: Math.floor(Date.now() / 1000), // número UNIX timestamp
-        updated_at: new Date(),
+        //updated_at: new Date(),
         transaction_id: null,
         ref_payco: null,
       }).returning({ id: epaycoOrders.id }); // ✅ Obtiene el ID generado
