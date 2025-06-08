@@ -5,7 +5,7 @@ import { epaycoOrders, epaycoOrderItems } from '@/lib/epayco/schema';
 import { users, products } from '@/lib/usuarios/schema';
 import { eq } from 'drizzle-orm';
 import { getAuth } from '@clerk/nextjs/server';
-import { sql } from 'drizzle-orm'; // Para tipos numéricos en SQLite
+import { sql } from 'drizzle-orm'; // Importamos sql para tipos numéricos en SQLite
 
 export async function POST(request: NextRequest) {
   try {
@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
     if (!userId) return NextResponse.json({ error: "No autorizado" }, { status: 401 });
 
     // Buscar usuario
-    const userResult = await db.select().from(users).where(eq(users.clerk_id, userId));
+    const userResult = await db.users.select().from(users).where(eq(users.clerk_id, userId));
     if (!userResult.length) return NextResponse.json({ error: "Usuario no encontrado" }, { status: 404 });
 
     const currentSaldo = Number(userResult[0].saldo);
@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
 
     // Verificar stock
     for (const producto of productos) {
-      const prodArr = await db.select().from(products).where(eq(products.id, producto.id));
+      const prodArr = await db.products.select().from(products).where(eq(products.id, producto.id));
       const prod = prodArr[0];
       if (!prod || prod.quantity < producto.quantity) {
         return NextResponse.json({ error: `Stock insuficiente para ${producto.name}` }, { status: 400 });
@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
     try {
       // 1. Actualizar saldo
       const newBalance = currentSaldo - total;
-      await db.update(users)
+      await db.users.update(users)
         .set({ saldo: newBalance.toString() })
         .where(eq(users.clerk_id, userId));
 
@@ -76,9 +76,9 @@ export async function POST(request: NextRequest) {
 
       const insertedId = inserted.id;
 
-      // 6. Insertar items en epayco_order_items
+      // 5. Insertar items en epayco_order_items
       for (const producto of productos) {
-        const prodArr = await db.select().from(products).where(eq(products.id, producto.id));
+        const prodArr = await db.products.select().from(products).where(eq(products.id, producto.id));
         const prod = prodArr[0];
         await db.insert(epaycoOrderItems).values({
           order_id: insertedId,
@@ -93,9 +93,9 @@ export async function POST(request: NextRequest) {
         });
       }
 
-      // 7. Actualizar stock
+      // 6. Actualizar stock
       for (const producto of productos) {
-        const prodArr = await db.select().from(products).where(eq(products.id, producto.id));
+        const prodArr = await db.products.select().from(products).where(eq(products.id, producto.id));
         const prod = prodArr[0];
         await db.update(products)
           .set({ quantity: prod.quantity - producto.quantity })
