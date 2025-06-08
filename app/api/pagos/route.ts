@@ -67,14 +67,17 @@ export async function POST(request: NextRequest) {
         //updated_at: new Date(),
         transaction_id: null,
         ref_payco: null,
-      }).returning({ id: epaycoOrders.id }); // ✅ Obtiene el ID generado
+      });
+
+      //4.1 Obtener el id generado con last
+      const insertedId = await db.epayco.lastInsertRowid();
 
       // 5. Insertar items en epayco_order_items (usando `id` devuelto)
       for (const producto of productos) {
         const prodArr = await db.products.select().from(products).where(eq(products.id, producto.id));
         const prod = prodArr[0];
         await db.epayco.insert(epaycoOrderItems).values({
-          order_id: insertedOrder.id, // ✅ Usamos el ID devuelto por la base de datos
+          order_id: insertedId, // ✅ Usamos el ID devuelto por la base de datos
           product_id: producto.id.toString(),
           title: producto.name,
           price: producto.price,
@@ -97,7 +100,7 @@ export async function POST(request: NextRequest) {
         success: true,
         message: 'Pago procesado',
         newBalance: newBalance.toString(),
-        orderId: insertedOrder.id.toString(), // ✅ Devuelve el ID generado
+        orderId: insertedId.toString(), // ✅ Devuelve el ID generado
         referenceCode: referenceCode,
       });
 
