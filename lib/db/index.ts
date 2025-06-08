@@ -60,6 +60,7 @@ const epaycoDb = drizzle(epaycoClient, {
     epaycoOrders: epaycoSchema.epaycoOrders,
     epaycoOrderItems: epaycoSchema.epaycoOrderItems
   }
+});
 
 export const db = {
   products: productsDb,
