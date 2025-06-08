@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import db from '@/lib/db';
+import db from '@/lib/epayco';
 import { epaycoOrders, epaycoOrderItems } from '@/lib/epayco/schema';
 import { users, products } from '@/lib/usuarios/schema';
 import { eq } from 'drizzle-orm';
