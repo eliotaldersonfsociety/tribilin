@@ -11,7 +11,7 @@ export async function POST(request: NextRequest) {
     const { productos, total, type } = body;
 
     // Obtener usuario autenticado con Clerk
-    const { userId } = getAuth(request);
+    const { userId } = await getAuth(request);
     if (!userId) {
       return NextResponse.json({ error: "No autorizado" }, { status: 401 });
     }
