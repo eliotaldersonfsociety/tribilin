@@ -104,48 +104,82 @@ export default function Checkout() {
   };
 
   const handleSaldoPayment = async () => {
-    if (isProcessing) return;
+  if (isProcessing) return;
 
-    try {
-      setIsProcessing(true);
-      const validationErrors = validateDeliveryInfo();
-      if (validationErrors.length > 0) {
-        validationErrors.forEach(error => toast.error(error));
-        setIsProcessing(false);
-        return;
-      }
+  try {
+    setIsProcessing(true);
 
-      const response = await fetch('/api/pagos', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          productos: cart.items,
-          total: cart.total,
-          address: deliveryInfo.address,
-          city: deliveryInfo.city,
-          name: deliveryInfo.name,
-          phone: deliveryInfo.phone,
-          document: deliveryInfo.document,
-          documentType: deliveryInfo.documentType,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Error al procesar el pago con saldo');
-      }
-
-      const data = await response.json();
-      clearCart();
-      router.push(`/thankyou/saldo?orderId=${data.orderId}`);
-    } catch (error) {
-      console.error('Error en pago con saldo:', error);
-      toast.error('Error al procesar el pago con saldo. Por favor, intenta de nuevo.');
-    } finally {
+    // Validar carrito
+    if (!cart.items || !Array.isArray(cart.items) || cart.items.length === 0) {
+      toast.error('Tu carrito está vacío');
       setIsProcessing(false);
+      return;
     }
-  };
+
+    const validationErrors = validateDeliveryInfo();
+    if (validationErrors.length > 0) {
+      validationErrors.forEach(error => toast.error(error));
+      setIsProcessing(false);
+      return;
+    }
+
+    // Limpiar datos del carrito
+    const cleanCartItems = cart.items.map(item => ({
+      id: item.id.toString(),
+      name: item.name,
+      price: parseFloat(item.price.toString()),
+      image: typeof item.image === 'string' ? item.image : '',
+      quantity: parseInt(item.quantity.toString(), 10),
+      color: item.color || '',
+      size: item.size || '',
+      sizeRange: item.sizeRange || ''
+    }));
+
+    const finalTotal = parseFloat(cart.total.toString());
+
+    // Debugging
+    console.log('Datos enviados a /api/pagos:', {
+      productos: cleanCartItems,
+      total: finalTotal,
+      address: deliveryInfo.address,
+      city: deliveryInfo.city,
+      name: deliveryInfo.name,
+      phone: deliveryInfo.phone,
+      document: deliveryInfo.document,
+      documentType: deliveryInfo.documentType,
+    });
+
+    const response = await fetch('/api/pagos', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        productos: cleanCartItems,
+        total: finalTotal,
+        address: deliveryInfo.address,
+        city: deliveryInfo.city,
+        name: deliveryInfo.name,
+        phone: deliveryInfo.phone,
+        document: deliveryInfo.document,
+        documentType: deliveryInfo.documentType,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error('Error al procesar el pago con saldo');
+    }
+
+    const data = await response.json();
+    clearCart();
+    router.push(`/thankyou/saldo?orderId=${data.orderId}`);
+  } catch (error) {
+    console.error('Error en pago con saldo:', error);
+    toast.error('Error al procesar el pago con saldo. Por favor, intenta de nuevo.');
+  } finally {
+    setIsProcessing(false);
+  }
+};
 
   const handleEpaycoPayment = async () => {
   if (isProcessing) return;
