@@ -77,7 +77,6 @@ export async function POST(request: NextRequest) {
 
       // 4. Insertar en epaycoOrders
       await db.epayco.insert(epaycoOrders).values({
-        id: orderId,
         reference_code: referenceCode,
         clerk_id: userId,
         amount: total,
