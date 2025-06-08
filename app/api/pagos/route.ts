@@ -5,6 +5,7 @@ import { epaycoOrders, epaycoOrderItems } from '@/lib/epayco/schema';
 import { users, products } from '@/lib/usuarios/schema';
 import { eq } from 'drizzle-orm';
 import { getAuth } from '@clerk/nextjs/server';
+import { sql } from 'drizzle-orm'; // ✅ Añade esta línea
 
 export async function POST(request: NextRequest) {
   try {
