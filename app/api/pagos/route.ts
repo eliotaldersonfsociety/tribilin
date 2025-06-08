@@ -63,7 +63,7 @@ export async function POST(request: NextRequest) {
         buyer_name: buyerName,
         document_type: documentType,
         document_number: documentNumber,
-        processing_date: integer('processing_date', { mode: 'number' }),
+        processing_date: Math.floor(Date.now() / 1000),
   	    updated_at: integer('updated_at', { mode: 'number' }).notNull(),
         transaction_id: null,
         ref_payco: null,
