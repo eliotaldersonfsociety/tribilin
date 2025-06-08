@@ -37,6 +37,7 @@ export default function Checkout() {
   const { user, isLoaded } = useUser(); // ¡Importante! Usar isLoaded
   const { cart, clearCart } = useCart();
   const { initializeCheckout } = useEpaycoCheckout();
+  const [userSaldo, setUserSaldo] = useState<number | null>(null);
   const [paymentMethod, setPaymentMethod] = useState('epayco');
   const [isProcessing, setIsProcessing] = useState(false);
   const [tipAmount, setTipAmount] = useState<string | null>(null);
@@ -77,6 +78,24 @@ export default function Checkout() {
 
     checkAuth();
   }, [isLoaded, user, cart.items.length, router]); // Agregar isLoaded como dependencia
+
+  // Añade este useEffect
+    useEffect(() => {
+      if (!isLoaded || !user) return;
+      
+      const fetchSaldo = async () => {
+        try {
+          const res = await fetch('/api/user/saldo');
+          const data = await res.json();
+          setUserSaldo(data.saldo);
+        } catch (error) {
+          console.error("Error fetching saldo:", error);
+          toast.error('Error al obtener saldo');
+        }
+      };
+    
+    fetchSaldo();
+  }, [isLoaded, user]);
 
   const validateDeliveryInfo = () => {
     const errors = [];
@@ -334,7 +353,7 @@ export default function Checkout() {
               setPaymentMethod={setPaymentMethod}
               isProcessing={isProcessing}
               isSignedIn={!!user}
-              userSaldo={100} // Ejemplo de saldo de usuario
+              userSaldo={userSaldo}
             />
 
             <TipSection
