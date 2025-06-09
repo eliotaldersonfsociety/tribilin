@@ -87,8 +87,12 @@ export default function Checkout() {
         try {
           console.log('📡 1. Iniciando solicitud a /api/user/saldo'); // ✅ Log de inicio
     
-          const res = await fetch('/api/user/saldo');
-          console.log('📡 2. Respuesta recibida:', res.status, res.statusText); // ✅ Log de respuesta
+          const res = await fetch('/api/user/saldo' {
+            headers: {
+              Authorization: `Bearer ${token}`, // ✅ necesario para que Clerk detecte al usuario
+            },
+          });
+          console.log('📡 2. Respuesta recibida:', res.status, res.statusText);
     
           const data = await res.json();
           console.log('📡 3. Datos obtenidos:', data); // ✅ Log de datos
