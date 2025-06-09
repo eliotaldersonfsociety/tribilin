@@ -13,8 +13,8 @@ export async function GET(request: NextRequest) {
     });
   }
 
-  const userResult = await db.select().from(users).where(eq(users.clerk_id, userId));
-
+  const userResult = await db.usuarios.select().from(users).where(eq(users.clerk_id, userId));
+  
   if (!userResult.length) {
     return new Response(JSON.stringify({ error: 'Usuario no encontrado' }), {
       status: 404,
