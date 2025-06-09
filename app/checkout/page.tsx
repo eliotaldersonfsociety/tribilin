@@ -87,7 +87,7 @@ export default function Checkout() {
         try {
           console.log('📡 1. Iniciando solicitud a /api/user/saldo'); // ✅ Log de inicio
     
-          const res = await fetch('/api/user/saldo' {
+          const res = await fetch('/api/user/saldo', {
             headers: {
               Authorization: `Bearer ${token}`, // ✅ necesario para que Clerk detecte al usuario
             },
