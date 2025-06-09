@@ -85,7 +85,7 @@ export default function Checkout() {
       
       const fetchSaldo = async () => {
         try {
-          const res = await fetch('/api/user/saldo');
+          const res = await fetch('/api/pagos');
           const data = await res.json();
           setUserSaldo(data.saldo);
         } catch (error) {
