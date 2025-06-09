@@ -80,37 +80,34 @@ export default function Checkout() {
     checkAuth();
   }, [isLoaded, user, cart.items.length, router]); // Agregar isLoaded como dependencia
 
-  // Añade este useEffect
-    // In your useEffect where you fetch the saldo
-    useEffect(() => {
-      if (!isLoaded || !user) return;
-    
-      const fetchSaldo = async () => {
-        try {
-          const res = await fetch('/api/user');
-    
-          if (!res.ok) {
-            throw new Error('No se pudo obtener el saldo');
-          }
-    
-          console.log('📡 2. Respuesta recibida:', res.status, res.statusText);
-    
-          const data = await res.json();
-          console.log('📡 3. Datos obtenidos:', data);
-    
-          // Convert saldo to a number before setting it
-          setUserSaldo(Number(data.saldo));
-        } catch (error) {
-          console.error('📡 4. Error al obtener saldo:', error);
-          toast.error('Error al obtener saldo');
-        }
-      };
-    
-      fetchSaldo();
-    }, [isLoaded, user]);
+  useEffect(() => {
+  if (!isLoaded || !user) return;
 
-// When using userSaldo, ensure it is a number
-const formattedSaldo = userSaldo?.toFixed(2);
+  const fetchSaldo = async () => {
+    try {
+      const res = await fetch('/api/user');
+
+      if (!res.ok) {
+        throw new Error('No se pudo obtener el saldo');
+      }
+
+      const data = await res.json();
+      console.log('📡 3. Datos obtenidos:', data);
+
+      // Convierte `saldo` a un número antes de establecerlo en el estado
+      const saldoNumber = Number(data.saldo);
+      setUserSaldo(saldoNumber);
+    } catch (error) {
+      console.error('📡 4. Error al obtener saldo:', error);
+      toast.error('Error al obtener saldo');
+    }
+  };
+
+  fetchSaldo();
+}, [isLoaded, user]);
+
+const formattedSaldo = userSaldo !== null ? userSaldo.toFixed(2) : '0.00';
+
 
 
   const validateDeliveryInfo = () => {
