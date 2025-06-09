@@ -86,12 +86,11 @@ export default function Checkout() {
       const fetchSaldo = async () => {
         try {
           console.log('📡 1. Iniciando solicitud a /api/user/saldo'); // ✅ Log de inicio
+          const res = await fetch('/api/user/saldo');
+            if (!res.ok) {
+              throw new Error('No se pudo obtener el saldo');
+            }
     
-          const res = await fetch('/api/user/saldo', {
-            headers: {
-              Authorization: `Bearer ${token}`, // ✅ necesario para que Clerk detecte al usuario
-            },
-          });
           console.log('📡 2. Respuesta recibida:', res.status, res.statusText);
     
           const data = await res.json();
