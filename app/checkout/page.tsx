@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useUser } from '@clerk/nextjs';
+import { useAuth, useUser } from '@clerk/nextjs';
 import { toast } from 'react-toastify';
 import { useCart } from '@/hooks/useCart';
 import { useEpaycoCheckout } from '@/hooks/useEpaycoCheckout';
@@ -35,6 +35,7 @@ interface CartItem {
 export default function Checkout() {
   const router = useRouter();
   const { user, isLoaded } = useUser(); // ¡Importante! Usar isLoaded
+  const { getToken } = useAuth();
   const { cart, clearCart } = useCart();
   const { initializeCheckout } = useEpaycoCheckout();
   const [userSaldo, setUserSaldo] = useState<number | null>(null);
@@ -85,10 +86,10 @@ export default function Checkout() {
     
       const fetchSaldo = async () => {
         try {
-          const token = await user.getToken();
+          const token = await getToken();
           const res = await fetch('/api/user/saldo', {
             headers: {
-            Authorization: `Bearer ${token}`,
+              Authorization: `Bearer ${token}`,
           },
         });
           
