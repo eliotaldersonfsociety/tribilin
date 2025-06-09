@@ -67,20 +67,20 @@ export default function Checkout() {
 
       console.log('✅ Usuario autenticado:', user.id);
       
-      // Solo verificar carrito si el usuario está autenticado
-      if (cart.items.length === 0) {
+       // Solo verificar carrito si el usuario está autenticado y no ha completado un pago
+      if (!paymentSuccess && cart.items.length === 0) {
         console.log('⚠️ Carrito vacío detectado');
         toast.info('Tu carrito está vacío');
         router.push('/');
         return;
       }
-
+  
       console.log('✅ Carrito tiene productos:', cart.items.length);
     };
 
-    checkAuth();
-  }, [isLoaded, user, cart.items.length, router]); // Agregar isLoaded como dependencia
-
+  checkAuth();
+}, [isLoaded, user, cart.items.length, router, paymentSuccess]);
+  
   useEffect(() => {
   if (!isLoaded || !user) return;
 
@@ -173,18 +173,6 @@ console.log('Valor de userSaldo:', userSaldo);
 
     const finalTotal = parseFloat(cart.total.toString());
 
-    // Debugging
-    console.log('Datos enviados a /api/pagos:', {
-      productos: cleanCartItems,
-      total: finalTotal,
-      address: deliveryInfo.address,
-      city: deliveryInfo.city,
-      name: deliveryInfo.name,
-      phone: deliveryInfo.phone,
-      document: deliveryInfo.document,
-      documentType: deliveryInfo.documentType,
-    });
-
     const response = await fetch('/api/pagos', {
       method: 'POST',
       headers: {
@@ -208,6 +196,7 @@ console.log('Valor de userSaldo:', userSaldo);
 
     const data = await response.json();
     clearCart();
+    setPaymentSuccess(true); // Establecer el estado de pago exitoso
     router.push(`/thankyou/saldo?orderId=${data.orderId}`);
   } catch (error) {
     console.error('Error en pago con saldo:', error);
