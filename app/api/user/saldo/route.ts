@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    const userResult = await db.select().from(users).where(eq(users.clerk_id, userId));
+    const userResult = await db.users.select().from(users).where(eq(users.clerk_id, userId));
     console.log('🔍 Resultado de búsqueda:', userResult);
 
     if (!userResult.length) {
