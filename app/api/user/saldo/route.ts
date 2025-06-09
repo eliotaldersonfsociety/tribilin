@@ -7,7 +7,7 @@ import { eq } from 'drizzle-orm';
 export async function GET(request: NextRequest) {
   console.log('✅ Iniciando solicitud a /api/user/saldo');
   try {
-    const { userId } = await getAuth();
+    const { userId } = await getAuth(request);
     console.log('🔍 Usuario autenticado:', userId);
 
     if (!userId) {
