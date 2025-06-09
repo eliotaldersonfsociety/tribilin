@@ -85,8 +85,14 @@ export default function Checkout() {
     
       const fetchSaldo = async () => {
         try {
-          console.log('📡 1. Iniciando solicitud a /api/user/saldo'); // ✅ Log de inicio
+          console.log('📡 1. Iniciando solicitud a /api/user/saldo', {
+          const token = await user.getToken();
           const res = await fetch('/api/user/saldo');
+            headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+          
             if (!res.ok) {
               throw new Error('No se pudo obtener el saldo');
             }
