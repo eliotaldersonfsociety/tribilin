@@ -86,12 +86,7 @@ export default function Checkout() {
     
       const fetchSaldo = async () => {
         try {
-          const token = await getToken();
-          const res = await fetch('/api/user/saldo', {
-            headers: {
-              Authorization: `Bearer ${token}`,
-          },
-        });
+          const res = await fetch('/api/user/saldo');
           
             if (!res.ok) {
               throw new Error('No se pudo obtener el saldo');
