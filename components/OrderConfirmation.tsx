@@ -49,11 +49,20 @@ export default function OrderConfirmation() {
     const fetchOrderDetails = async () => {
       const orderIdParam = searchParams.get('orderId');
       const statusParam = searchParams.get('status');
+      const typeParam = searchParams.get('type'); // Nuevo parámetro
       if (!orderIdParam) return; 
 
       try {
         const response = await fetch(`/api/epayco/order/${orderIdParam}`);
         const orderData = await response.json();
+
+        // Si es pago con saldo, asume APPROVED
+      if (typeParam === 'saldo') {
+        finalStatus = 'APPROVED';
+      } else if (typeParam === 'epayco' && orderData.status) {
+        // Si es pago con ePayco, usa el estado devuelto por la API
+        finalStatus = orderData.status.toLowerCase();
+      }
 
         const normalizedStatus = (statusParam || orderData.status || 'pending').toLowerCase();
         setStatus(normalizedStatus);
