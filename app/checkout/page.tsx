@@ -197,7 +197,6 @@ console.log('Valor de userSaldo:', userSaldo);
     const data = await response.json();
     setPaymentSuccess(true); // Establecer el estado de pago exitoso
     router.push(`/thankyou/saldo?orderId=${data.orderId}`);
-    clearCart();
   } catch (error) {
     console.error('Error en pago con saldo:', error);
     toast.error('Error al procesar el pago con saldo. Por favor, intenta de nuevo.');
