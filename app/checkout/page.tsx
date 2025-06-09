@@ -82,20 +82,26 @@ export default function Checkout() {
   // Añade este useEffect
     useEffect(() => {
       if (!isLoaded || !user) return;
-      
+    
       const fetchSaldo = async () => {
         try {
-          const res = await fetch('/api/user/saldo/');
+          console.log('📡 1. Iniciando solicitud a /api/user/saldo'); // ✅ Log de inicio
+    
+          const res = await fetch('/api/user/saldo');
+          console.log('📡 2. Respuesta recibida:', res.status, res.statusText); // ✅ Log de respuesta
+    
           const data = await res.json();
+          console.log('📡 3. Datos obtenidos:', data); // ✅ Log de datos
+    
           setUserSaldo(data.saldo);
         } catch (error) {
-          console.error("Error fetching saldo:", error);
+          console.error('📡 4. Error al obtener saldo:', error); // ✅ Log de error
           toast.error('Error al obtener saldo');
         }
       };
     
-    fetchSaldo();
-  }, [isLoaded, user]);
+      fetchSaldo();
+    }, [isLoaded, user]);
 
   const validateDeliveryInfo = () => {
     const errors = [];
