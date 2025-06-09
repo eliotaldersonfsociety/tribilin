@@ -81,31 +81,37 @@ export default function Checkout() {
   }, [isLoaded, user, cart.items.length, router]); // Agregar isLoaded como dependencia
 
   // Añade este useEffect
+    // In your useEffect where you fetch the saldo
     useEffect(() => {
       if (!isLoaded || !user) return;
     
       const fetchSaldo = async () => {
         try {
           const res = await fetch('/api/user');
-          
-            if (!res.ok) {
-              throw new Error('No se pudo obtener el saldo');
-            }
+    
+          if (!res.ok) {
+            throw new Error('No se pudo obtener el saldo');
+          }
     
           console.log('📡 2. Respuesta recibida:', res.status, res.statusText);
     
           const data = await res.json();
-          console.log('📡 3. Datos obtenidos:', data); // ✅ Log de datos
+          console.log('📡 3. Datos obtenidos:', data);
     
-          setUserSaldo(data.saldo);
+          // Convert saldo to a number before setting it
+          setUserSaldo(Number(data.saldo));
         } catch (error) {
-          console.error('📡 4. Error al obtener saldo:', error); // ✅ Log de error
+          console.error('📡 4. Error al obtener saldo:', error);
           toast.error('Error al obtener saldo');
         }
       };
     
       fetchSaldo();
     }, [isLoaded, user]);
+
+// When using userSaldo, ensure it is a number
+const formattedSaldo = userSaldo?.toFixed(2);
+
 
   const validateDeliveryInfo = () => {
     const errors = [];
