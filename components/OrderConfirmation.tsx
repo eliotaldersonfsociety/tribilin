@@ -67,7 +67,7 @@ export default function OrderConfirmation() {
         const normalizedStatus = (statusParam || orderData.status || 'pending').toLowerCase();
         setStatus(normalizedStatus);
 
-        setStatus(statusParam || orderData.status || 'pending');
+        setStatus(statusParam || orderData.status || 'pending' || finalStatus);
         
         setOrderItems(orderData.items || []);
         setAddress({
