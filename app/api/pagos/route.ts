@@ -78,7 +78,7 @@ export async function POST(request: NextRequest) {
 
       console.log('8. Saldo actualizado correctamente');
 
-      // 2. Generar código de referencia
+      // 2. Generar código de referenciaaaa
       const referenceCode = `SALDO_${Date.now().toString()}`;
       console.log('9. Código de referencia generado:', referenceCode);
 
