@@ -56,6 +56,8 @@ export default function OrderConfirmation() {
         const response = await fetch(`/api/epayco/order/${orderIdParam}`);
         const orderData = await response.json();
 
+        let finalStatus = (statusParam || orderData.status || 'pending').toLowerCase();
+
         // Si es pago con saldo, asume APPROVED
       if (typeParam === 'saldo') {
         finalStatus = 'APPROVED';
@@ -67,7 +69,7 @@ export default function OrderConfirmation() {
         const normalizedStatus = (statusParam || orderData.status || 'pending').toLowerCase();
         setStatus(normalizedStatus);
 
-        setStatus(statusParam || orderData.status || 'pending' || finalStatus);
+        setStatus(finalStatus);
         
         setOrderItems(orderData.items || []);
         setAddress({
