@@ -68,7 +68,7 @@ export default function Checkout() {
       console.log('✅ Usuario autenticado:', user.id);
       
        // Solo verificar carrito si el usuario está autenticado y no ha completado un pago
-      if (!paymentSuccess && cart.items.length === 0) {
+      if (cart.items.length === 0 && !paymentSuccess) {
         console.log('⚠️ Carrito vacío detectado');
         toast.info('Tu carrito está vacío');
         router.push('/');
@@ -195,9 +195,9 @@ console.log('Valor de userSaldo:', userSaldo);
     }
 
     const data = await response.json();
-    clearCart();
     setPaymentSuccess(true); // Establecer el estado de pago exitoso
     router.push(`/thankyou/saldo?orderId=${data.orderId}`);
+    clearCart();
   } catch (error) {
     console.error('Error en pago con saldo:', error);
     toast.error('Error al procesar el pago con saldo. Por favor, intenta de nuevo.');
