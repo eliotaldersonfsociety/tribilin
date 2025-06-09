@@ -1,7 +1,7 @@
 import { NextRequest } from 'next/server';
 import { getAuth } from '@clerk/nextjs/server';
 import db from '@/lib/db';
-import { users } from '@/lib/usuarios/schema'; // Asegúrate de que este sea el esquema correcto
+import { users } from '@/lib/usuarios/schema';
 import { eq } from 'drizzle-orm';
 
 export async function GET(request: NextRequest) {
@@ -17,8 +17,7 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    // ✅ Usa `db.users.select()` porque en `lib/db/index.ts` está definido como `users`
-    const userResult = await db.users.select().from(users).where(eq(users.clerk_id, userId));
+    const userResult = await db.select().from(users).where(eq(users.clerk_id, userId));
     console.log('🔍 Resultado de búsqueda:', userResult);
 
     if (!userResult.length) {
