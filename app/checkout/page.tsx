@@ -68,7 +68,7 @@ export default function Checkout() {
       console.log('✅ Usuario autenticado:', user.id);
       
        // Solo verificar carrito si el usuario está autenticado y no ha completado un pago
-      if (cart.items.length === 0 && !paymentSuccess) {
+      if (cart.items.length === 0) {
         console.log('⚠️ Carrito vacío detectado');
         toast.info('Tu carrito está vacío');
         router.push('/');
@@ -146,7 +146,7 @@ console.log('Valor de userSaldo:', userSaldo);
     setIsProcessing(true);
 
     // Validar carrito
-    if (!cart.items || !Array.isArray(cart.items) || cart.items.length === 0) {
+    if (!cart.items || cart.items.length === 0) {
       toast.error('Tu carrito está vacío');
       setIsProcessing(false);
       return;
@@ -197,6 +197,7 @@ console.log('Valor de userSaldo:', userSaldo);
     const data = await response.json();
     setPaymentSuccess(true); // Establecer el estado de pago exitoso
     router.push(`/thankyou/saldo?orderId=${data.orderId}`);
+    clearCart();
   } catch (error) {
     console.error('Error en pago con saldo:', error);
     toast.error('Error al procesar el pago con saldo. Por favor, intenta de nuevo.');
