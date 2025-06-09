@@ -39,6 +39,7 @@ export default function Checkout() {
   const { cart, clearCart } = useCart();
   const { initializeCheckout } = useEpaycoCheckout();
   const [userSaldo, setUserSaldo] = useState<number | null>(null);
+  const [paymentSuccess, setPaymentSuccess] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState('epayco');
   const [isProcessing, setIsProcessing] = useState(false);
   const [tipAmount, setTipAmount] = useState<string | null>(null);
