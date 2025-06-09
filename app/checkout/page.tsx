@@ -86,7 +86,7 @@ export default function Checkout() {
     
       const fetchSaldo = async () => {
         try {
-          const res = await fetch('/api/user/saldo/');
+          const res = await fetch('/api/user');
           
             if (!res.ok) {
               throw new Error('No se pudo obtener el saldo');
