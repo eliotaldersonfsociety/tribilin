@@ -39,9 +39,6 @@ export default function Checkout() {
   const { getToken } = useAuth();
   const { cart, clearCart } = useCart();
   const { initializeCheckout } = useEpaycoCheckout();
-  const [paymentSuccess, setPaymentSuccess] = useState(false);
-  const [paymentMethod, setPaymentMethod] = useState('epayco');
-  const [userSaldo, setUserSaldo] = useState<number | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [tipAmount, setTipAmount] = useState<string | null>(null);
   const [deliveryInfo, setDeliveryInfo] = useState<DeliveryInfo>({
@@ -80,7 +77,7 @@ export default function Checkout() {
     };
 
   checkAuth();
-}, [isLoaded, user, cart.items.length, router, paymentSuccess]);
+}, [isLoaded, user, cart.items.length, router]);
 
   /*
 
@@ -130,6 +127,7 @@ const fetchUserSaldo = async (userId: string, forceUpdate: boolean) => {
     setDeliveryInfo(prev => ({ ...prev, [name]: value }));
   };
 
+  /*
   const handleSaldoPayment = async () => {
   if (isProcessing) return;
 
@@ -207,6 +205,8 @@ const fetchUserSaldo = async (userId: string, forceUpdate: boolean) => {
     setIsProcessing(false);
   }
 };
+
+*/
 
   const handleEpaycoPayment = async () => {
   if (isProcessing) return;
@@ -287,7 +287,7 @@ const fetchUserSaldo = async (userId: string, forceUpdate: boolean) => {
 };
 
 
-
+/*
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (isProcessing) return;
@@ -303,7 +303,22 @@ const fetchUserSaldo = async (userId: string, forceUpdate: boolean) => {
         toast.error('Método de pago no válido');
     }
   };
+*/
 
+const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (isProcessing) return;
+
+    const validationErrors = validateDeliveryInfo();
+    if (validationErrors.length > 0) {
+      validationErrors.forEach(error => toast.error(error));
+      return;
+    }
+
+    await handleEpaycoPayment();
+  };
+
+  
   const calculateTax = () => {
     return cart.total * 0.19; // 19% IVA
   };
