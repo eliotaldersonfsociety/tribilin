@@ -82,26 +82,9 @@ export default function Checkout() {
 }, [isLoaded, user, cart.items.length, router, paymentSuccess]);
 
   useEffect(() => {
-  if (!isLoaded || !user || paymentMethod !== 'saldo') return;
-
-  const fetchSaldo = async () => {
-    try {
-      const res = await fetch('/api/user');
-      if (!res.ok) {
-        throw new Error('No se pudo obtener el saldo');
-      }
-
-      const data = await res.json();
-      const saldoNumber = Number(data.saldo);
-      setUserSaldo(saldoNumber);
-    } catch (error) {
-      console.error('Error al obtener saldo:', error);
-      toast.error('Error al obtener saldo');
-    }
-  };
-
-  fetchSaldo();
-}, [isLoaded, user, paymentMethod, paymentSuccess]); // Dependencia de paymentMethod
+    if (!isLoaded || !user) return;
+    fetchUserSaldo(user.id, true);
+  }, [isLoaded, user, paymentSuccess, paymentMethod]);
 
   
   const validateDeliveryInfo = () => {
