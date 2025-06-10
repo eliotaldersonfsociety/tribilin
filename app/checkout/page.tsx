@@ -373,11 +373,11 @@ const handleSubmit = async (e: React.FormEvent) => {
             <ShippingMethod />
 
             <PaymentMethod
-              //paymentMethod={paymentMethod}
+              paymentMethod={paymentMethod}
               setPaymentMethod={setPaymentMethod}
               isProcessing={isProcessing}
               //userSaldo={userSaldo} // Pasar el saldo como prop
-              isSignedIn={!!user}
+              //isSignedIn={!!user}
             />
 
             <TipSection
