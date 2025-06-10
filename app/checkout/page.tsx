@@ -101,7 +101,7 @@ export default function Checkout() {
   };
 
   fetchSaldo();
-}, [isLoaded, user, paymentMethod]); // Dependencia de paymentMethod
+}, [isLoaded, user, paymentMethod, paymentSuccess]); // Dependencia de paymentMethod
 
   
   const validateDeliveryInfo = () => {
