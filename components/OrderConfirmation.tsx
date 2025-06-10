@@ -49,7 +49,7 @@ export default function OrderConfirmation() {
     const fetchOrderDetails = async () => {
       const orderIdParam = searchParams.get('orderId');
       const statusParam = searchParams.get('status');
-      const typeParam = searchParams.get('type'); // Nuevo parámetro
+      const typeParam = searchParams.get('type'); // Nuevo parámetrolk
       if (!orderIdParam) return; 
 
       try {
