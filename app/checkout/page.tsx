@@ -357,8 +357,8 @@ const fetchUserSaldo = async (userId: string, forceUpdate: boolean) => {
             <ShippingMethod />
 
             <PaymentMethod
-              paymentMethod={paymentMethod}
-              setPaymentMethod={setPaymentMethod}
+              //paymentMethod={paymentMethod}
+              //setPaymentMethod={setPaymentMethod}
               isProcessing={isProcessing}
               //userSaldo={userSaldo} // Pasar el saldo como prop
               isSignedIn={!!user}
