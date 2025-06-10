@@ -82,6 +82,7 @@ export default function Checkout() {
   checkAuth();
 }, [isLoaded, user, cart.items.length, router, paymentSuccess]);
 
+  /*
 
   useEffect(() => {
   if (!isLoaded || !user) return;
@@ -102,7 +103,7 @@ const fetchUserSaldo = async (userId: string, forceUpdate: boolean) => {
   }
 };
 
-
+*/
   
   const validateDeliveryInfo = () => {
     const errors = [];
@@ -359,7 +360,7 @@ const fetchUserSaldo = async (userId: string, forceUpdate: boolean) => {
               paymentMethod={paymentMethod}
               setPaymentMethod={setPaymentMethod}
               isProcessing={isProcessing}
-              userSaldo={userSaldo} // Pasar el saldo como prop
+              //userSaldo={userSaldo} // Pasar el saldo como prop
               isSignedIn={!!user}
             />
 
