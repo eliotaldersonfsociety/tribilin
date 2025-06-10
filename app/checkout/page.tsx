@@ -38,7 +38,6 @@ export default function Checkout() {
   const { getToken } = useAuth();
   const { cart, clearCart } = useCart();
   const { initializeCheckout } = useEpaycoCheckout();
-  const [userSaldo, setUserSaldo] = useState<number | null>(null);
   const [paymentSuccess, setPaymentSuccess] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState('epayco');
   const [isProcessing, setIsProcessing] = useState(false);
@@ -98,7 +97,6 @@ export default function Checkout() {
       // Convierte `saldo` a un número antes de establecerlo en el estado
       const saldoNumber = Number(data.saldo);
       console.log('Saldo convertido a número:', saldoNumber);
-      setUserSaldo(saldoNumber);
     } catch (error) {
       console.error('📡 4. Error al obtener saldo:', error);
       toast.error('Error al obtener saldo');
@@ -107,19 +105,6 @@ export default function Checkout() {
 
   fetchSaldo();
 }, [isLoaded, user]);
-
-// Log para verificar el valor del saldo en el estado
-useEffect(() => {
-  console.log('Valor del saldo en el estado:', userSaldo);
-}, [userSaldo]);
-
-const formattedSaldo = userSaldo !== null ? userSaldo.toFixed(2) : '0.00';
-console.log('Tipo de userSaldo:', typeof userSaldo);
-console.log('Valor de userSaldo:', userSaldo);
-console.log('Saldo formateado:', formattedSaldo)
-
-
-
 
   const validateDeliveryInfo = () => {
     const errors = [];
@@ -367,7 +352,6 @@ console.log('Saldo formateado:', formattedSaldo)
               setPaymentMethod={setPaymentMethod}
               isProcessing={isProcessing}
               isSignedIn={!!user}
-              userSaldo={userSaldo}
             />
 
             <TipSection
