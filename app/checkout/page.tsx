@@ -82,10 +82,40 @@ export default function Checkout() {
   checkAuth();
 }, [isLoaded, user, cart.items.length, router, paymentSuccess]);
 
+  const fetchUserSaldo = async (userId: string, forceUpdate: boolean) => {
+  try {
+    const response = await fetch(`/api/user?userId=${userId}&forceUpdate=${forceUpdate}`);
+    if (!response.ok) {
+      throw new Error('Failed to fetch user balance');
+    }
+    const data = await response.json();
+    setUserSaldo(Number(data.saldo));
+  } catch (error) {
+    console.error('Error fetching user balance:', error);
+    toast.error('Error al obtener el saldo del usuario');
+  }
+};
+
+
   useEffect(() => {
-    if (!isLoaded || !user) return;
-    fetchUserSaldo(user.id, true);
-  }, [isLoaded, user, paymentSuccess, paymentMethod]);
+  if (!isLoaded || !user) return;
+  fetchUserSaldo(user.id, true);
+}, [isLoaded, user, paymentSuccess, paymentMethod]);
+
+const fetchUserSaldo = async (userId: string, forceUpdate: boolean) => {
+  try {
+    const response = await fetch(`/api/user?userId=${userId}&forceUpdate=${forceUpdate}`);
+    if (!response.ok) {
+      throw new Error('Failed to fetch user balance');
+    }
+    const data = await response.json();
+    setUserSaldo(Number(data.saldo));
+  } catch (error) {
+    console.error('Error fetching user balance:', error);
+    toast.error('Error al obtener el saldo del usuario');
+  }
+};
+
 
   
   const validateDeliveryInfo = () => {
