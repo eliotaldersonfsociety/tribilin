@@ -97,6 +97,7 @@ export default function Checkout() {
 
       // Convierte `saldo` a un número antes de establecerlo en el estado
       const saldoNumber = Number(data.saldo);
+      console.log('Saldo convertido a número:', saldoNumber);
       setUserSaldo(saldoNumber);
     } catch (error) {
       console.error('📡 4. Error al obtener saldo:', error);
@@ -106,6 +107,11 @@ export default function Checkout() {
 
   fetchSaldo();
 }, [isLoaded, user]);
+
+// Log para verificar el valor del saldo en el estado
+useEffect(() => {
+  console.log('Valor del saldo en el estado:', userSaldo);
+}, [userSaldo]);
 
 const formattedSaldo = userSaldo !== null ? userSaldo.toFixed(2) : '0.00';
 console.log('Tipo de userSaldo:', typeof userSaldo);
