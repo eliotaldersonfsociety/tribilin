@@ -191,7 +191,17 @@ export default function Checkout() {
     const data = await response.json();
     setPaymentSuccess(true); // Establecer el estado de pago exitoso
     router.push(`/thankyou/saldo?orderId=${data.orderId}&status=APPROVED`);
-    clearCart();
+
+        // Forzar la actualización del saldo después de la compra
+    const res = await fetch('/api/user');
+    if (!res.ok) {
+      throw new Error('No se pudo obtener el saldo actualizado');
+    }
+
+    const updatedData = await res.json();
+    setUserSaldo(Number(updatedData.saldo));
+
+  
   } catch (error) {
     console.error('Error en pago con saldo:', error);
     toast.error('Error al procesar el pago con saldo. Por favor, intenta de nuevo.');
