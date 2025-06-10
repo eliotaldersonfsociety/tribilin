@@ -171,7 +171,7 @@ console.log('Valor de userSaldo:', userSaldo);
       sizeRange: item.sizeRange || ''
     }));
 
-    const finalTotal = parseFloat(cart.total.toString());
+    const finalTotal = parseFloat(cart.total.toString()) + calculateTip();
 
     const response = await fetch('/api/pagos', {
       method: 'POST',
@@ -181,6 +181,7 @@ console.log('Valor de userSaldo:', userSaldo);
       body: JSON.stringify({
         productos: cleanCartItems,
         total: finalTotal,
+        tip: calculateTip(),
         address: deliveryInfo.address,
         city: deliveryInfo.city,
         name: deliveryInfo.name,
