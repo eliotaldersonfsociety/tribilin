@@ -25,14 +25,14 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
       <p className="text-sm text-gray-600 mb-4">
         Todas las transacciones son seguras y están encriptadas.
       </p>
-      {/*
-      //saldo
+      {/* RadioGroup para seleccionar método de pago */}
       <RadioGroup
         value={paymentMethod}
         onValueChange={setPaymentMethod}
         className="mb-8 space-y-2"
         disabled={isProcessing}
       >
+        {/*
         {isSignedIn && (
           <Label
             htmlFor="saldo"
@@ -56,7 +56,6 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
             </div>
           </Label>
         )}
-
         */}
 
         {/* Opción ePayco */}
@@ -88,12 +87,14 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
       </RadioGroup>
 
     
-      //* Paneles contextuales */}
-      //{paymentMethod === 'saldo' && isSignedIn && (
-        //<div className="border-t-0 rounded-b-md px-4 py-2 bg-gray-50 text-sm text-gray-600 -mt-2">
-         // Se usará tu saldo disponible. Asegúrate de tener suficiente.
-        //</div>
-      //)}
+      {/* Panel contextual según método de pago */}
+      {/*
+      {paymentMethod === 'saldo' && isSignedIn && (
+        <div className="border-t-0 rounded-b-md px-4 py-2 bg-gray-50 text-sm text-gray-600 -mt-2">
+          Se usará tu saldo disponible. Asegúrate de tener suficiente.
+        </div>
+      )}
+      */}
 
       {paymentMethod === 'epayco' && (
         <div className="border-t-0 rounded-b-md px-4 py-2 bg-gray-50 text-sm text-gray-600 -mt-2">
