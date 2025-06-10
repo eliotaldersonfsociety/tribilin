@@ -8,16 +8,12 @@ interface PaymentMethodProps {
   paymentMethod: string;
   setPaymentMethod: (value: string) => void;
   isProcessing: boolean;
-  //userSaldo: number | null;
-  isSignedIn: boolean;
 }
 
 export const PaymentMethod: React.FC<PaymentMethodProps> = ({
   paymentMethod,
   setPaymentMethod,
   isProcessing,
-  //userSaldo,
-  isSignedIn,
 }) => {
   return (
     <div className="mb-6">
@@ -25,40 +21,13 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
       <p className="text-sm text-gray-600 mb-4">
         Todas las transacciones son seguras y están encriptadas.
       </p>
-      {/* 
+
       <RadioGroup
         value={paymentMethod}
         onValueChange={setPaymentMethod}
         className="mb-8 space-y-2"
         disabled={isProcessing}
       >
-        
-        {isSignedIn && (
-          <Label
-            htmlFor="saldo"
-            className={`border rounded-md p-4 flex justify-between items-center cursor-pointer transition-colors duration-150 ${
-              paymentMethod === 'saldo'
-                ? 'bg-blue-50 border-blue-500 ring-2 ring-blue-300'
-                : 'border-gray-300 hover:border-gray-400'
-            }`}
-          >
-            <div className="flex items-center gap-3">
-              <RadioGroupItem id="saldo" value="saldo" />
-              <span>
-                Saldo Disponible:{' '}
-                <span className="font-semibold">
-                  ${userSaldo?.toFixed(2) ?? '0.00'}
-                </span>
-              </span>
-            </div>
-            <div className="bg-green-500 text-white px-2 py-0.5 rounded text-xs font-bold">
-              $
-            </div>
-          </Label>
-        )}
-        */}
-
-        {/* Opción ePayco */}
         <Label
           htmlFor="epayco"
           className={`border rounded-md p-4 flex justify-between items-center cursor-pointer transition-colors duration-150 ${
@@ -85,16 +54,6 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
           </div>
         </Label>
       </RadioGroup>
-
-    
-      {/* Panel contextual según método de pago */}
-      {/*
-      {paymentMethod === 'saldo' && isSignedIn && (
-        <div className="border-t-0 rounded-b-md px-4 py-2 bg-gray-50 text-sm text-gray-600 -mt-2">
-          Se usará tu saldo disponible. Asegúrate de tener suficiente.
-        </div>
-      )}
-      */}
 
       {paymentMethod === 'epayco' && (
         <div className="border-t-0 rounded-b-md px-4 py-2 bg-gray-50 text-sm text-gray-600 -mt-2">
