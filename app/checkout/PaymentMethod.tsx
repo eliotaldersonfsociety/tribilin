@@ -25,14 +25,14 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
       <p className="text-sm text-gray-600 mb-4">
         Todas las transacciones son seguras y están encriptadas.
       </p>
-      {/* RadioGroup para seleccionar método de pago */}
+      {/* 
       <RadioGroup
         value={paymentMethod}
         onValueChange={setPaymentMethod}
         className="mb-8 space-y-2"
         disabled={isProcessing}
       >
-        {/*
+        
         {isSignedIn && (
           <Label
             htmlFor="saldo"
