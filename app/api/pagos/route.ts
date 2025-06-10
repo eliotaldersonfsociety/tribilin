@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     console.log('2. Cuerpo de la solicitud:', body);
 
-    const { productos, total } = body;
+    const { productos, total, tip } = body;
 
     if (!productos || !Array.isArray(productos)) {
       console.error('⚠️ Productos no válidos:', productos);
@@ -105,7 +105,7 @@ export async function POST(request: NextRequest) {
           amount: sql<number>`CAST(${total} AS REAL)`,
           tax: sql<number>`CAST(${total * 0.19} AS REAL)`,
           tax_base: sql<number>`CAST(${total * 0.19} AS REAL)`,
-          tip: sql<number>`${body.tip || 0}`,
+          tip: sql<number>`${tip || 0}`,
           status: 'APPROVED',
           shipping_address: body.address || '',
           shipping_city: body.city || '',
