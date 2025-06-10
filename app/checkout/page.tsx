@@ -108,8 +108,9 @@ export default function Checkout() {
 }, [isLoaded, user]);
 
 const formattedSaldo = userSaldo !== null ? userSaldo.toFixed(2) : '0.00';
-  console.log('Tipo de userSaldo:', typeof userSaldo);
+console.log('Tipo de userSaldo:', typeof userSaldo);
 console.log('Valor de userSaldo:', userSaldo);
+console.log('Saldo formateado:', formattedSaldo)
 
 
 
