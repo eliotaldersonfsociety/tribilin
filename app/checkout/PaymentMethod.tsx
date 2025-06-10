@@ -57,9 +57,9 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
           </Label>
         )}
 
-        {/* Opción PayU */}
+        {/* Opción ePayco */}
         <Label
-          htmlFor="payu"
+          htmlFor="epayco"
           className={`border rounded-md p-4 flex justify-between items-center cursor-pointer transition-colors duration-150 ${
             paymentMethod === 'epayco'
               ? 'bg-blue-50 border-blue-500 ring-2 ring-blue-300'
@@ -93,7 +93,7 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
       )}
       {paymentMethod === 'epayco' && (
         <div className="border-t-0 rounded-b-md px-4 py-2 bg-gray-50 text-sm text-gray-600 -mt-2">
-          Serás redirigido a la pasarela segura de PayU para completar tu pago.
+          Serás redirigido a la pasarela segura de ePayco para completar tu pago.
         </div>
       )}
     </div>
