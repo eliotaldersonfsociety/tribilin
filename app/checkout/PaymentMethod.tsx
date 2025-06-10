@@ -8,7 +8,7 @@ interface PaymentMethodProps {
   paymentMethod: string;
   setPaymentMethod: (value: string) => void;
   isProcessing: boolean;
-  userSaldo: number | null;
+  //userSaldo: number | null;
   isSignedIn: boolean;
 }
 
@@ -16,7 +16,7 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
   paymentMethod,
   setPaymentMethod,
   isProcessing,
-  userSaldo,
+  //userSaldo,
   isSignedIn,
 }) => {
   return (
@@ -25,14 +25,14 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
       <p className="text-sm text-gray-600 mb-4">
         Todas las transacciones son seguras y están encriptadas.
       </p>
-
+      {/*
+      //saldo
       <RadioGroup
         value={paymentMethod}
         onValueChange={setPaymentMethod}
         className="mb-8 space-y-2"
         disabled={isProcessing}
       >
-        {/* Opción Saldo */}
         {isSignedIn && (
           <Label
             htmlFor="saldo"
@@ -56,6 +56,8 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
             </div>
           </Label>
         )}
+
+        */}
 
         {/* Opción ePayco */}
         <Label
@@ -85,12 +87,14 @@ export const PaymentMethod: React.FC<PaymentMethodProps> = ({
         </Label>
       </RadioGroup>
 
-      {/* Paneles contextuales */}
-      {paymentMethod === 'saldo' && isSignedIn && (
-        <div className="border-t-0 rounded-b-md px-4 py-2 bg-gray-50 text-sm text-gray-600 -mt-2">
-          Se usará tu saldo disponible. Asegúrate de tener suficiente.
-        </div>
-      )}
+    
+      //* Paneles contextuales */}
+      //{paymentMethod === 'saldo' && isSignedIn && (
+        //<div className="border-t-0 rounded-b-md px-4 py-2 bg-gray-50 text-sm text-gray-600 -mt-2">
+         // Se usará tu saldo disponible. Asegúrate de tener suficiente.
+        //</div>
+      //)}
+
       {paymentMethod === 'epayco' && (
         <div className="border-t-0 rounded-b-md px-4 py-2 bg-gray-50 text-sm text-gray-600 -mt-2">
           Serás redirigido a la pasarela segura de ePayco para completar tu pago.
