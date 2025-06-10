@@ -6,7 +6,7 @@ import { useAuth, useUser } from '@clerk/nextjs';
 import { toast } from 'react-toastify';
 import { useCart } from '@/hooks/useCart';
 import { useEpaycoCheckout } from '@/hooks/useEpaycoCheckout';
-import { useBalanceStore } from '@/lib/balanceStore';
+//import { useBalanceStore } from '@/lib/balanceStore';
 import { DeliveryInfoForm } from './DeliveryInfoForm';
 import { PaymentMethod } from './PaymentMethod';
 import { OrderSummary } from './OrderSummary';
@@ -41,6 +41,7 @@ export default function Checkout() {
   const { initializeCheckout } = useEpaycoCheckout();
   const [isProcessing, setIsProcessing] = useState(false);
   const [tipAmount, setTipAmount] = useState<string | null>(null);
+  const [paymentMethod, setPaymentMethod] = useState('epayco'); // Define paymentMethod state
   const [deliveryInfo, setDeliveryInfo] = useState<DeliveryInfo>({
     name: '',
     address: '',
@@ -373,7 +374,7 @@ const handleSubmit = async (e: React.FormEvent) => {
 
             <PaymentMethod
               //paymentMethod={paymentMethod}
-              //setPaymentMethod={setPaymentMethod}
+              setPaymentMethod={setPaymentMethod}
               isProcessing={isProcessing}
               //userSaldo={userSaldo} // Pasar el saldo como prop
               isSignedIn={!!user}
