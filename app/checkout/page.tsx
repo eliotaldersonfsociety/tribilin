@@ -6,6 +6,7 @@ import { useAuth, useUser } from '@clerk/nextjs';
 import { toast } from 'react-toastify';
 import { useCart } from '@/hooks/useCart';
 import { useEpaycoCheckout } from '@/hooks/useEpaycoCheckout';
+import { useBalanceStore } from '@/lib/balanceStore';
 import { DeliveryInfoForm } from './DeliveryInfoForm';
 import { PaymentMethod } from './PaymentMethod';
 import { OrderSummary } from './OrderSummary';
