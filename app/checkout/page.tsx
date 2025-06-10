@@ -40,6 +40,7 @@ export default function Checkout() {
   const { initializeCheckout } = useEpaycoCheckout();
   const [paymentSuccess, setPaymentSuccess] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState('epayco');
+  const [userSaldo, setUserSaldo] = useState<number | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [tipAmount, setTipAmount] = useState<string | null>(null);
   const [deliveryInfo, setDeliveryInfo] = useState<DeliveryInfo>({
@@ -351,6 +352,7 @@ export default function Checkout() {
               paymentMethod={paymentMethod}
               setPaymentMethod={setPaymentMethod}
               isProcessing={isProcessing}
+              userSaldo={userSaldo} // Pasar el saldo como prop
               isSignedIn={!!user}
             />
 
