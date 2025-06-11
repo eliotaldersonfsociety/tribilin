@@ -49,23 +49,23 @@ export default function PanelPage() {
     }
   }, [isLoaded, user, router]);
 
-  useEffect(() => {
-  if (user && user.publicMetadata?.isAdmin) {
-    fetch('/api/pagos/numerodepagos')
-      .then(response => response.json())
-      .then(data => {
-        if (typeof data.count === 'number') {
-          setNumeroDeCompras(data.count);
-          if (typeof window !== "undefined") {
-            localStorage.setItem('numero_de_compras', data.count.toString());
-          }
-        }
-      })
-      .catch(error => {
-        console.error('Error al obtener el número de compras:', error);
-      });
-  }
-}, [user]);
+  fetch('/api/pagos/numerodepagos')
+  .then(response => {
+    if (!response.ok) throw new Error('Error en la respuesta del servidor');
+    return response.json();
+  })
+  .then(data => {
+    console.log('Datos recibidos:', data); // <--- Mira esto
+    if (typeof data.count === 'number') {
+      setNumeroDeCompras(data.count);
+      localStorage.setItem('numero_de_compras', data.count.toString());
+    } else {
+      console.warn('El campo count no es un número o no existe:', data);
+    }
+  })
+  .catch(error => {
+    console.error('Error al obtener el número de compras:', error);
+  });
 
       useEffect(() => {
   if (!user || !user.publicMetadata?.isAdmin) return;
