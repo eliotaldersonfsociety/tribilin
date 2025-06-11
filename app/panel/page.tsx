@@ -49,34 +49,31 @@ export default function PanelPage() {
     }
   }, [isLoaded, user, router]);
 
-  fetch('/api/pagos/numerodepagos')
-  .then(response => {
-    if (!response.ok) throw new Error('Error en la respuesta del servidor');
-    return response.json();
-  })
-  .then(data => {
-    console.log('Datos recibidos:', data); // <--- Mira esto
-    if (typeof data.count === 'number') {
-      setNumeroDeCompras(data.count);
-      localStorage.setItem('numero_de_compras', data.count.toString());
-    } else {
-      console.warn('El campo count no es un número o no existe:', data);
-    }
-  })
-  .catch(error => {
-    console.error('Error al obtener el número de compras:', error);
-  });
-
-      useEffect(() => {
+  useEffect(() => {
   if (!user || !user.publicMetadata?.isAdmin) return;
 
-  // Cargar de localStorage
-  if (typeof window !== "undefined") {
-    const localWishlistId = localStorage.getItem('dashboard_lastWishlistId');
-    if (localWishlistId) {
-      setLastWishlistId(Number(localWishlistId));
-    }
-  }
+  fetch('/api/pagos/numerodepagos')
+    .then(response => {
+      if (!response.ok) throw new Error('Error en la respuesta del servidor');
+      return response.json();
+    })
+    .then(data => {
+      console.log('Datos recibidos:', data);
+
+      if (typeof data.count === 'number') {
+        setNumeroDeCompras(data.count);
+        localStorage.setItem('numero_de_compras', data.count.toString());
+      }
+
+      if (data.lastPurchaseDate) {
+        setLastPurchaseDate(data.lastPurchaseDate);
+        localStorage.setItem('last_purchase_date', data.lastPurchaseDate);
+      }
+    })
+    .catch(error => {
+      console.error('Error al obtener los datos:', error);
+    });
+}, [user]);
 
   // Hacer fetch
   fetch('/api/wishlist/numero')
