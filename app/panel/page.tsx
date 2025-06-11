@@ -99,52 +99,36 @@ export default function PanelPage() {
     });
 }, [user]);
 
-      // SALDO: 1. Intentar cargar de localStorage
-      if (typeof window !== "undefined") {
-        const localSaldo = localStorage.getItem('dashboard_saldo');
-        if (localSaldo) {
-          setSaldo(Number(localSaldo));
-          setLoading(false);
-        }
-      }
+      useEffect(() => {
+  if (!user || !user.publicMetadata?.isAdmin) return;
 
-      // SALDO: 2. Hacer fetch a la API
-      fetch('/api/balance', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ userId: user.id }),
-      })
-        .then(response => {
-          console.log('Response from /api/balance:', response);
-          return response.json();
-        })
-        .then(data => {
-          console.log('Data from /api/balance:', data);
-          if (data.saldo !== undefined) {
-            setSaldo(data.saldo);
-            if (typeof window !== "undefined") {
-              localStorage.setItem('dashboard_saldo', data.saldo);
-            }
-          }
-          setLoading(false);
-        })
-        .catch(error => {
-          console.error('Error al obtener el saldo:', error);
-          setLoading(false);
-        });
-
-      // Cargar comprasPendientes de localStorage si existe
-      if (typeof window !== "undefined") {
-        const compras = localStorage.getItem('compras_pendientes');
-        if (compras) {
-          setComprasPendientes(JSON.parse(compras));
-        }
-      }
+  // Cargar de localStorage
+  if (typeof window !== "undefined") {
+    const localSaldo = localStorage.getItem('dashboard_saldo');
+    if (localSaldo) {
+      setSaldo(Number(localSaldo));
     }
-  }, [user, isLoaded]);
+  }
 
+  // Hacer fetch
+  fetch('/api/balance', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ userId: user.id }),
+  })
+    .then(response => response.json())
+    .then(data => {
+      if (data.saldo !== undefined) {
+        setSaldo(data.saldo);
+        if (typeof window !== "undefined") {
+          localStorage.setItem('dashboard_saldo', data.saldo.toString());
+        }
+      }
+    })
+    .catch(error => {
+      console.error('Error al obtener el saldo:', error);
+    });
+}, [user]);
   console.log('Before memo calculations');
   const name = user?.firstName || '';
   const lastname = user?.lastName || '';
