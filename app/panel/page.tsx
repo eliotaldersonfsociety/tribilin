@@ -49,20 +49,18 @@ export default function PanelPage() {
 
   useEffect(() => {
     if (user && user.publicMetadata?.isAdmin) {
-      // Obtener número de compras
+      // Fetch número de compras
       fetch('/api/pagos/numerodepagos')
         .then(response => response.json())
         .then(data => {
           if (typeof data.count === 'number') {
             setNumeroDeCompras(data.count);
-            if (typeof window !== "undefined") {
-              localStorage.setItem('numero_de_compras', data.count.toString());
-            }
+            localStorage.setItem('numero_de_compras', data.count.toString());
           }
         })
         .catch(error => console.error('Error al obtener el número de compras:', error));
 
-      // Obtener wishlist
+      // Fetch wishlist
       fetch('/api/wishlist/numero')
         .then(res => {
           if (res.status === 401) {
@@ -80,7 +78,7 @@ export default function PanelPage() {
         })
         .catch(error => console.error('Error al obtener el número de productos favoritos:', error));
 
-      // Obtener saldo
+      // Fetch saldo
       fetch('/api/balance', {
         method: 'POST',
         headers: {
@@ -92,9 +90,7 @@ export default function PanelPage() {
         .then(data => {
           if (data.saldo !== undefined) {
             setSaldo(data.saldo);
-            if (typeof window !== "undefined") {
-              localStorage.setItem('dashboard_saldo', data.saldo.toString());
-            }
+            localStorage.setItem('dashboard_saldo', data.saldo.toString());
           }
           setLoading(false);
         })
@@ -156,7 +152,7 @@ export default function PanelPage() {
   const handleInternalBalancePayment = async () => {
     setLoading(true);
     try {
-      // Aquí iría tu lógica de pago
+      // Lógica de pago
       setLoading(false);
     } catch (error: any) {
       console.error("Error en el pago con saldo:", error);
