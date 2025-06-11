@@ -49,9 +49,6 @@ export default function PanelPage() {
     }
   }, [isLoaded, user, router]);
 
-  useEffect(() => {
-  if (!user || !user.publicMetadata?.isAdmin) return;
-
   fetch('/api/pagos/numerodepagos')
     .then(response => {
       if (!response.ok) throw new Error('Error en la respuesta del servidor');
