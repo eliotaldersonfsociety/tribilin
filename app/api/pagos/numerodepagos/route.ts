@@ -1,7 +1,8 @@
-// app/api/epayco/numerodepagos/route.ts
+// app/api/pagos/numerodepagos/route.ts
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/epayco/db';
 import { epaycoOrders } from '@/lib/epayco/schema';
+import { sql } from 'drizzle-orm';
 
 export async function GET() {
   try {
