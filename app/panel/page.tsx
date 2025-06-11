@@ -49,30 +49,28 @@ export default function PanelPage() {
   }, [isLoaded, user, router]);
 
   useEffect(() => {
-    if (user && user.publicMetadata?.isAdmin) {
-      // Obtener compras
-      fetch('/api/pagos/numerodepagos')
-        .then(response => {
-          console.log('Response from /api/pagos/numerodepagos:', response);
-          return response.json();
-        })
-        .then(data => {
-          console.log('Data from /api/pagos/numerodepagos:', data);
-          if (data.purchases) {
-            const purchasesFixed = data.purchases.map((purchase: any) => ({
-              ...purchase,
-              products: typeof purchase.products === 'string' ? JSON.parse(purchase.products) : purchase.products,
-            }));
-            setPurchases(purchasesFixed);
-            if (typeof window !== "undefined") {
-              localStorage.setItem('compras_pendientes', JSON.stringify(purchasesFixed));
-              setComprasPendientes(purchasesFixed);
-            }
+  if (user && user.publicMetadata?.isAdmin) {
+    // Obtener número de compras
+    fetch('/api/pagos/numerodepagos')
+      .then(response => {
+        console.log('Response from /api/pagos/numerodepagos:', response);
+        return response.json();
+      })
+      .then(data => {
+        console.log('Data from /api/pagos/numerodepagos:', data);
+        if (typeof data.count === 'number') {
+          setNumeroDeCompras(data.count); // Asegúrate de tener este estado definido
+          if (typeof window !== "undefined") {
+            localStorage.setItem('numero_de_compras', data.count.toString());
           }
-        })
-        .catch(error => {
-          console.error('Error al obtener las compras:', error);
-        });
+        }
+      })
+      .catch(error => {
+        console.error('Error al obtener el número de compras:', error);
+      });
+  }
+}, [user]);
+
 
       // WISHLIST: 1. Intentar cargar de localStorage
       if (typeof window !== "undefined") {
