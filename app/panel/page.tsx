@@ -40,6 +40,7 @@ export default function PanelPage() {
   const [comprasPendientes, setComprasPendientes] = useState<any[]>([]);
   const purchasesPerPage = 5;
   const [wishlistCount, setWishlistCount] = useState<number | null>(null);
+  const [numeroDeCompras, setNumeroDeCompras] = useState<number>(0);
 
 
   useEffect(() => {
