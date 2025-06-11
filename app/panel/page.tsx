@@ -135,7 +135,6 @@ useEffect(() => {
   const email = user?.primaryEmailAddress?.emailAddress || '';
 
   const lastPurchaseId = purchases.length > 0 ? purchases[0].id : 'N/A';
-  const lastPurchaseDate = purchases.length > 0 ? new Date(purchases[0].created_at).toLocaleDateString() : 'N/A';
 
   // Lógica de paginación
   const indexOfLastPurchase = currentPage * purchasesPerPage;
