@@ -220,7 +220,7 @@ export default function PanelPage() {
               <div className="flex flex-row items-center justify-between pb-2">
                 <div className="text-sm font-medium">Envios Pendientes</div>
               </div>
-              <div className="text-xl sm:text-2xl font-bold">{lastPurchaseId}</div>
+              <div className="text-xl sm:text-2xl font-bold">{numeroDeCompras}</div>
               <div className="text-xs text-muted-foreground">Última compra: {lastPurchaseDate}</div>
             </div>
 
