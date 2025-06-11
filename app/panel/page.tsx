@@ -41,6 +41,7 @@ export default function PanelPage() {
   const purchasesPerPage = 5;
   const [wishlistCount, setWishlistCount] = useState<number | null>(null);
   const [numeroDeCompras, setNumeroDeCompras] = useState<number>(0);
+  const [lastPurchaseDate, setLastPurchaseDate] = useState<string | null>(null);
 
 
   useEffect(() => {
@@ -220,7 +221,7 @@ useEffect(() => {
                 <div className="text-sm font-medium">Envios Pendientes</div>
               </div>
               <div className="text-xl sm:text-2xl font-bold">{numeroDeCompras}</div>
-              <div className="text-xs text-muted-foreground">Última compra: {lastPurchaseDate}</div>
+              <div className="text-xs text-muted-foreground">Última compra: {lastPurchaseDateFormatted}</div>
             </div>
 
             <div className="rounded-lg border bg-card p-4 sm:p-6 shadow-sm">
