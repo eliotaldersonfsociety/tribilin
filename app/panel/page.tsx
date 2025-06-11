@@ -29,9 +29,9 @@ interface Purchase {
 }
 
 export default function PanelPage() {
-  // TODOS los hooks aquí, sin returns antes
   const { user, isLoaded } = useUser();
   const router = useRouter();
+
   const [purchases, setPurchases] = useState<Purchase[]>([]);
   const [lastWishlistId, setLastWishlistId] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
@@ -42,52 +42,30 @@ export default function PanelPage() {
   const [wishlistCount, setWishlistCount] = useState<number | null>(null);
   const [numeroDeCompras, setNumeroDeCompras] = useState<number>(0);
 
-
   useEffect(() => {
     if (isLoaded && user && !user.publicMetadata?.isAdmin) {
       router.replace("/dashboard");
     }
-  }, [isLoaded, user, router]);
 
-  useEffect(() => {
-  if (user && user.publicMetadata?.isAdmin) {
-    // Obtener número de compras
-    fetch('/api/pagos/numerodepagos')
-      .then(response => {
-        console.log('Response from /api/pagos/numerodepagos:', response);
-        return response.json();
-      })
-      .then(data => {
-        console.log('Data from /api/pagos/numerodepagos:', data);
-        if (typeof data.count === 'number') {
-          setNumeroDeCompras(data.count); // Asegúrate de tener este estado definido
-          if (typeof window !== "undefined") {
+    if (user && user.publicMetadata?.isAdmin) {
+      fetch('/api/pagos/numerodepagos')
+        .then(response => response.json())
+        .then(data => {
+          if (typeof data.count === 'number') {
+            setNumeroDeCompras(data.count);
             localStorage.setItem('numero_de_compras', data.count.toString());
           }
-        }
-      })
-      .catch(error => {
-        console.error('Error al obtener el número de compras:', error);
-      });
-  }
-}, [user]);
+        })
+        .catch(error => console.error('Error al obtener el número de compras:', error));
 
+      const localWishlistId = localStorage.getItem('dashboard_lastWishlistId');
+      if (localWishlistId) setLastWishlistId(Number(localWishlistId));
 
-      // WISHLIST: 1. Intentar cargar de localStorage
-      if (typeof window !== "undefined") {
-        const localWishlistId = localStorage.getItem('dashboard_lastWishlistId');
-        if (localWishlistId) {
-          setLastWishlistId(Number(localWishlistId));
-        }
-      }
-
-      // WISHLIST: 2. Hacer fetch a la API
       fetch('/api/wishlist/numero')
         .then(res => {
           if (res.status === 401) {
             setWishlistCount(null);
             localStorage.removeItem('dashboard_wishlistCount');
-            // Opcional: mostrar un toast o redirigir a login
             return null;
           }
           return res.json();
@@ -98,38 +76,24 @@ export default function PanelPage() {
             localStorage.setItem('dashboard_wishlistCount', data.wishlistCount);
           }
         })
-        .catch(error => {
-          console.error('Error al obtener el número de productos favoritos:', error);
-        });
+        .catch(error => console.error('Error al obtener el número de productos favoritos:', error));
 
-      // SALDO: 1. Intentar cargar de localStorage
-      if (typeof window !== "undefined") {
-        const localSaldo = localStorage.getItem('dashboard_saldo');
-        if (localSaldo) {
-          setSaldo(Number(localSaldo));
-          setLoading(false);
-        }
+      const localSaldo = localStorage.getItem('dashboard_saldo');
+      if (localSaldo) {
+        setSaldo(Number(localSaldo));
+        setLoading(false);
       }
 
-      // SALDO: 2. Hacer fetch a la API
       fetch('/api/balance', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId: user.id }),
       })
-        .then(response => {
-          console.log('Response from /api/balance:', response);
-          return response.json();
-        })
+        .then(response => response.json())
         .then(data => {
-          console.log('Data from /api/balance:', data);
           if (data.saldo !== undefined) {
             setSaldo(data.saldo);
-            if (typeof window !== "undefined") {
-              localStorage.setItem('dashboard_saldo', data.saldo);
-            }
+            localStorage.setItem('dashboard_saldo', data.saldo);
           }
           setLoading(false);
         })
@@ -138,17 +102,11 @@ export default function PanelPage() {
           setLoading(false);
         });
 
-      // Cargar comprasPendientes de localStorage si existe
-      if (typeof window !== "undefined") {
-        const compras = localStorage.getItem('compras_pendientes');
-        if (compras) {
-          setComprasPendientes(JSON.parse(compras));
-        }
-      }
+      const compras = localStorage.getItem('compras_pendientes');
+      if (compras) setComprasPendientes(JSON.parse(compras));
     }
   }, [user, isLoaded]);
 
-  console.log('Before memo calculations');
   const name = user?.firstName || '';
   const lastname = user?.lastName || '';
   const email = user?.primaryEmailAddress?.emailAddress || '';
@@ -156,67 +114,50 @@ export default function PanelPage() {
   const lastPurchaseId = purchases.length > 0 ? purchases[0].id : 'N/A';
   const lastPurchaseDate = purchases.length > 0 ? new Date(purchases[0].created_at).toLocaleDateString() : 'N/A';
 
-  // Lógica de paginación
   const indexOfLastPurchase = currentPage * purchasesPerPage;
   const indexOfFirstPurchase = indexOfLastPurchase - purchasesPerPage;
   const currentPurchases = purchases.slice(indexOfFirstPurchase, indexOfLastPurchase);
   const totalPages = Math.ceil(purchases.length / purchasesPerPage);
 
   const handleNextPage = () => {
-    console.log('handleNextPage called');
-    if (currentPage < totalPages) {
-      setCurrentPage(currentPage + 1);
-    }
+    if (currentPage < totalPages) setCurrentPage(currentPage + 1);
   };
 
   const handlePrevPage = () => {
-    console.log('handlePrevPage called');
-    if (currentPage > 1) {
-      setCurrentPage(currentPage - 1);
-    }
+    if (currentPage > 1) setCurrentPage(currentPage - 1);
   };
 
   const productosValidos = useMemo(() =>
-    currentPurchases.map(purchase => purchase.products).flat().filter(item => !!item.id && !isNaN(Number(item.id))),
+    currentPurchases.map(p => p.products).flat().filter(i => !!i.id && !isNaN(Number(i.id))),
     [currentPurchases]
   );
+
   const hayProductosInvalidos = useMemo(() =>
-    productosValidos.length !== currentPurchases.map(purchase => purchase.products).flat().length,
+    productosValidos.length !== currentPurchases.map(p => p.products).flat().length,
     [productosValidos, currentPurchases]
   );
 
-  console.log('Before useEffect 3');
   useEffect(() => {
-    console.log('Inside useEffect 3');
     if (hayProductosInvalidos) {
       toast.error("Hay productos inválidos en tu carrito. Por favor, actualiza tu carrito.");
     }
   }, [hayProductosInvalidos]);
 
   const handleInternalBalancePayment = async () => {
-    console.log('handleInternalBalancePayment called');
     setLoading(true);
     try {
-      // ... tu lógica de pago ...
-
-      // Guardar datos en localStorage, etc.
-
-      // const orderId = data.orderId; // <-- Comentado porque 'data' no está definido
-      // router.push(`/thankyou?orderId=${orderId}`);
-      return; // <-- IMPORTANTE: Detiene la ejecución aquí, el loading sigue en true
+      return;
     } catch (error: any) {
       console.error("Error en el pago con saldo:", error);
       toast.error(error.message || "Hubo un error al procesar tu pago");
-      setLoading(false); // Solo aquí se vuelve a habilitar el botón si hay error
+      setLoading(false);
     }
   };
 
-  // AHORA SÍ, los returns condicionales
   if (!isLoaded) return <div>Cargando...</div>;
   if (!user) return <div>No estás autenticado</div>;
   if (!user.publicMetadata?.isAdmin) return <div>No tienes acceso a este panel.</div>;
 
-  // Ahora sí, el return principal
   return (
     <DashboardLayouts>
       {hayProductosInvalidos ? (
@@ -261,7 +202,6 @@ export default function PanelPage() {
             </div>
           </div>
 
-          {/* Mensaje de bienvenida */}
           <div className="rounded-lg border shadow-sm">
             <div className="p-6">
               <h2 className="text-xl font-semibold">Bienvenido a tu Panel</h2>
@@ -271,7 +211,6 @@ export default function PanelPage() {
             </div>
           </div>
 
-          {/* Sección de compras */}
           <div className="rounded-lg border shadow-sm">
             <div className="p-6">
               <h2 className="text-xl font-semibold">Tus Compras</h2>
@@ -281,26 +220,24 @@ export default function PanelPage() {
                     {currentPurchases.map(purchase => (
                       <li key={purchase.id} className="mt-4 border-b pb-4">
                         <div className="text-sm font-medium space-y-2">
-                          {purchase.products.map(product => {
-                            return (
-                              <div key={product.id} className="flex items-center gap-3">
-                                <img
-                                  src={product.image || '/file.svg'}
-                                  alt={product.name}
-                                  className="w-12 h-12 object-cover rounded"
-                                />
-                                <div>
-                                  <div>{product.quantity} x {product.name}</div>
-                                  {product.color && (
-                                    <div className="text-xs text-muted-foreground">Color: {product.color}</div>
-                                  )}
-                                  {product.size && (
-                                    <div className="text-xs text-muted-foreground">Talla: {product.size}</div>
-                                  )}
-                                </div>
+                          {purchase.products.map(product => (
+                            <div key={product.id} className="flex items-center gap-3">
+                              <img
+                                src={product.image || '/file.svg'}
+                                alt={product.name}
+                                className="w-12 h-12 object-cover rounded"
+                              />
+                              <div>
+                                <div>{product.quantity} x {product.name}</div>
+                                {product.color && (
+                                  <div className="text-xs text-muted-foreground">Color: {product.color}</div>
+                                )}
+                                {product.size && (
+                                  <div className="text-xs text-muted-foreground">Talla: {product.size}</div>
+                                )}
                               </div>
-                            );
-                          })}
+                            </div>
+                          ))}
                         </div>
                         <div className="text-xs text-muted-foreground mt-2">SKU: {purchase.id}</div>
                         <div className="text-xs text-muted-foreground">Total: ${purchase.total}</div>
@@ -309,29 +246,25 @@ export default function PanelPage() {
                     ))}
                   </ul>
 
-                  {/* Controles de paginación */}
                   <div className="flex justify-between items-center mt-6">
                     <button
                       onClick={handlePrevPage}
                       disabled={currentPage === 1}
                       className="text-black px-4 py-2 bg-black-200 rounded hover:bg-black hover:text-white disabled:opacity-90"
                     >
-                      <ChevronLeft className="w-5 h-5" />
+                      <ChevronLeft size={16} /> Anterior
                     </button>
-                    <span className="text-sm text-muted-foreground">
-                      Página {currentPage} de {totalPages}
-                    </span>
                     <button
                       onClick={handleNextPage}
                       disabled={currentPage === totalPages}
                       className="text-black px-4 py-2 bg-black-200 rounded hover:bg-black hover:text-white disabled:opacity-90"
                     >
-                      <ChevronRight className="w-5 h-5" />
+                      Siguiente <ChevronRight size={16} />
                     </button>
                   </div>
                 </>
               ) : (
-                <p className="mt-2 text-muted-foreground">No tienes compras recientes.</p>
+                <div className="text-muted-foreground">No tienes compras registradas aún.</div>
               )}
             </div>
           </div>
