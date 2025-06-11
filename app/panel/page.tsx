@@ -44,10 +44,7 @@ export default function PanelPage() {
 
 
   useEffect(() => {
-    if (isLoaded && user && !user.publicMetadata?.isAdmin) {
-      router.replace("/dashboard");
-    }
-  }, [isLoaded, user, router]);
+  if (!user || !user.publicMetadata?.isAdmin) return;
 
   fetch('/api/pagos/numerodepagos')
     .then(response => {
@@ -56,12 +53,10 @@ export default function PanelPage() {
     })
     .then(data => {
       console.log('Datos recibidos:', data);
-
       if (typeof data.count === 'number') {
         setNumeroDeCompras(data.count);
         localStorage.setItem('numero_de_compras', data.count.toString());
       }
-
       if (data.lastPurchaseDate) {
         setLastPurchaseDate(data.lastPurchaseDate);
         localStorage.setItem('last_purchase_date', data.lastPurchaseDate);
@@ -71,6 +66,17 @@ export default function PanelPage() {
       console.error('Error al obtener los datos:', error);
     });
 }, [user]);
+
+useEffect(() => {
+  if (!user || !user.publicMetadata?.isAdmin) return;
+
+  // Cargar de localStorage
+  if (typeof window !== "undefined") {
+    const localWishlistId = localStorage.getItem('dashboard_lastWishlistId');
+    if (localWishlistId) {
+      setLastWishlistId(Number(localWishlistId));
+    }
+  }
 
   // Hacer fetch
   fetch('/api/wishlist/numero')
@@ -92,7 +98,6 @@ export default function PanelPage() {
       console.error('Error al obtener el número de productos favoritos:', error);
     });
 }, [user]);
-
       useEffect(() => {
   if (!user || !user.publicMetadata?.isAdmin) return;
 
