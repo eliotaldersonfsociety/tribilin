@@ -1,8 +1,20 @@
-// app/api/pagos/todas/route.ts
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/epayco/db';
 import { epaycoOrders, epaycoOrderItems } from '@/lib/epayco/schema';
 import { eq, sql } from 'drizzle-orm';
+
+// ✅ Agrega esto si no lo has definido
+type PurchaseItem = {
+  id: number;
+  name?: string;
+  title?: string;
+  price: number;
+  quantity: number;
+  image?: string;
+  color?: string;
+  size?: string;
+  sizeRange?: string;
+};
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
