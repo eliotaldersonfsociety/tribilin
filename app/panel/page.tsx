@@ -42,6 +42,7 @@ export default function PanelPage() {
   const [wishlistCount, setWishlistCount] = useState<number | null>(null);
   const [numeroDeCompras, setNumeroDeCompras] = useState<number>(0);
   const [lastPurchaseDate, setLastPurchaseDate] = useState<string | null>(null);
+  const [visits, setVisits] = useState<number | null>(null);
 
 
   useEffect(() => {
@@ -191,10 +192,32 @@ useEffect(() => {
     }
   };
 
+  useEffect(() => {
+  if (!user || !user.publicMetadata?.isAdmin) return;
+
+  fetch('/api/visitas') // Adjust the endpoint as necessary
+    .then(response => {
+      if (!response.ok) throw new Error('Error en la respuesta del servidor');
+      return response.json();
+    })
+    .then(data => {
+      if (typeof data.total === 'number') {
+        setVisits(data.total);
+        localStorage.setItem('numero_de_visitas', data.total.toString());
+      }
+    })
+    .catch(error => {
+      console.error('Error al obtener el número de visitas:', error);
+    });
+}, [user]);
+
+
   // AHORA SÍ, los returns condicionales
   if (!isLoaded) return <div>Cargando...</div>;
   if (!user) return <div>No estás autenticado</div>;
   if (!user.publicMetadata?.isAdmin) return <div>No tienes acceso a este panel.</div>;
+
+  
 
   // Ahora sí, el return principal
   return (
@@ -227,7 +250,7 @@ useEffect(() => {
               <div className="flex flex-row items-center justify-between pb-2">
                 <div className="text-sm font-medium">Visitantes en la Web:</div>
               </div>
-              <div className="text-xl sm:text-2xl font-bold">{lastWishlistId === 0 ? 'Sin productos' : lastWishlistId}</div>
+              <div className="text-xl sm:text-2xl font-bold">{visits !== null ? visits : 'Cargando...'}</div>
               <div className="text-xs text-muted-foreground">Numero de Producto</div>
             </div>
 
