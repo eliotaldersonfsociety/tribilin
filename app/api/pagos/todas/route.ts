@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
-import { db } from '@/lib/db/index';
+import { db } from '@/lib/epayco/db';
 import { epaycoOrders, epaycoOrderItems } from '@/lib/epayco/schema';
-import { desc, eq, sql } from 'drizzle-orm';
+import { and, desc, eq, sql } from 'drizzle-orm';
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
@@ -10,14 +10,14 @@ export async function GET(req: Request) {
   const offset = (page - 1) * itemsPerPage;
 
   try {
-    // Obtener total para paginación
-    const totalResult = await db
+    // Consulta total para paginación
+    const totalResult = await db.epayco
       .select({ count: sql<number>`count(*)` })
       .from(epaycoOrders);
     const total = totalResult[0]?.count || 0;
 
-    // Consulta principal con left join y json agregando items
-    const purchases = await db
+    // Consulta principal con join y agregación JSON de los items
+    const purchases = await db.epayco
       .select({
         id: epaycoOrders.id,
         referenceCode: epaycoOrders.referenceCode,
@@ -48,7 +48,7 @@ export async function GET(req: Request) {
       .limit(itemsPerPage)
       .offset(offset);
 
-    // Parsear el JSON de items a objetos JS
+    // Parsear el JSON de items a objetos
     const mappedPurchases = purchases.map((purchase) => {
       let items = [];
 
@@ -57,7 +57,7 @@ export async function GET(req: Request) {
         if (Array.isArray(parsed)) {
           items = parsed.map(item => ({
             ...item,
-            sizeRange: item.sizeRange, // ya está camelCase
+            sizeRange: item.sizeRange,
           }));
         }
       } catch (e) {
