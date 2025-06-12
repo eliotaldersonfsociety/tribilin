@@ -50,7 +50,7 @@ export default function PurchasesAdminPage() {
         headers: { 'Cache-Control': 'no-cache' }
       });
       const data = await res.json();
-      console.log("Datos recibidos del backend:", data); // Verifica los datos recibidos
+      console.log("Datos recibidos del backend:", data);
       setPurchases(Array.isArray(data.purchases) ? [...data.purchases] : []);
       setTotalItems(data.pagination?.total || 0);
     } catch (error) {
@@ -72,7 +72,7 @@ export default function PurchasesAdminPage() {
         headers: { 'Cache-Control': 'no-store' }
       });
       const data = await res.json();
-      console.log("Datos refrescados:", data); // Verifica los datos refrescados
+      console.log("Datos refrescados:", data);
       setPurchases(Array.isArray(data.purchases) ? [...data.purchases] : []);
       setTotalItems(data.pagination?.total || 0);
     } catch (error) {
@@ -83,13 +83,13 @@ export default function PurchasesAdminPage() {
     }
   };
 
-  const handleRowClick = (purchase) => {
-    console.log("Compra seleccionada:", purchase); // Verifica la compra seleccionada
+  const handleRowClick = (purchase: Purchase) => {
+    console.log("Compra seleccionada:", purchase);
     setSelectedPurchase(purchase);
     setIsModalOpen(true);
   };
 
-  const handleChangeStatus = async (newStatus) => {
+  const handleChangeStatus = async (newStatus: string) => {
     if (!selectedPurchase) return;
 
     setPurchases(prev => prev.map(p =>
@@ -109,7 +109,7 @@ export default function PurchasesAdminPage() {
         headers: { 'Cache-Control': 'no-cache' }
       });
       const data = await res.json();
-      console.log("Datos actualizados:", data); // Verifica los datos actualizados
+      console.log("Datos actualizados:", data);
       setPurchases(data.purchases);
     } catch (error) {
       console.error('Error al actualizar el estado:', error);
@@ -121,7 +121,7 @@ export default function PurchasesAdminPage() {
 
   const totalPages = Math.ceil(totalItems / itemsPerPage);
 
-  const renderPurchasesTable = (purchases) => {
+  const renderPurchasesTable = (purchases: Purchase[]) => {
     if (purchases.length === 0) {
       return (
         <div className="text-center py-8">
@@ -144,7 +144,6 @@ export default function PurchasesAdminPage() {
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">
           {purchases.map((purchase) => {
-            console.log("Datos de compra en render:", purchase); // Verifica cada compra en el render
             const validItems = Array.isArray(purchase.products)
               ? purchase.products
               : typeof purchase.products === 'string'
@@ -153,7 +152,7 @@ export default function PurchasesAdminPage() {
 
             const userNameOrEmail = purchase.buyer_name || purchase.user_email || '-';
             const productTitle = validItems.length > 0
-              ? validItems.map((item) => item.title || item.name).join(', ')
+              ? validItems.map((item: PurchaseItem) => item.title || item.name).join(', ')
               : purchase.description || 'Sin descripción';
 
             const date = new Date(Number(purchase.created_at));
