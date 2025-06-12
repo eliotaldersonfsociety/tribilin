@@ -2,13 +2,16 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/epayco/db';
 import { epaycoOrders, epaycoOrderItems } from '@/lib/epayco/schema';
-import { eq, sql } from 'drizzle-orm'; // Asegúrate de importar `sql`
+import { eq, sql } from 'drizzle-orm';
 
 export async function GET(request: Request) {
-  try {
-    const { page = 1, limit = 10, type = 'saldo' } = await request.json();
-    const offset = (page - 1) * limit;
+  const { searchParams } = new URL(request.url);
+  const page = Math.max(1, parseInt(searchParams.get('page') || '1'));
+  const limit = 10;
+  const type = searchParams.get('type') || 'saldo';
+  const offset = (page - 1) * limit;
 
+  try {
     const purchases = await db
       .select({
         id: epaycoOrders.id,
@@ -19,7 +22,6 @@ export async function GET(request: Request) {
         buyerEmail: epaycoOrders.buyer_email,
         buyerName: epaycoOrders.buyer_name,
         processingDate: epaycoOrders.processing_date,
-        items: epaycoOrderItems
       })
       .from(epaycoOrders)
       .leftJoin(
