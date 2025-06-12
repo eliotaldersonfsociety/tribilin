@@ -50,10 +50,11 @@ export default function PurchasesAdminPage() {
         headers: { 'Cache-Control': 'no-cache' }
       });
       const data = await res.json();
+      console.log("Datos recibidos del backend:", data); // Verifica los datos recibidos
       setPurchases(Array.isArray(data.purchases) ? [...data.purchases] : []);
       setTotalItems(data.pagination?.total || 0);
     } catch (error) {
-      console.error('Error fetching purchases:', error);
+      console.error('Error al obtener las compras:', error);
       setPurchases([]);
     } finally {
       setLoading(false);
@@ -71,22 +72,24 @@ export default function PurchasesAdminPage() {
         headers: { 'Cache-Control': 'no-store' }
       });
       const data = await res.json();
+      console.log("Datos refrescados:", data); // Verifica los datos refrescados
       setPurchases(Array.isArray(data.purchases) ? [...data.purchases] : []);
       setTotalItems(data.pagination?.total || 0);
     } catch (error) {
-      console.error('Error refreshing purchases:', error);
+      console.error('Error al refrescar las compras:', error);
       setPurchases([]);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleRowClick = (purchase: Purchase) => {
+  const handleRowClick = (purchase) => {
+    console.log("Compra seleccionada:", purchase); // Verifica la compra seleccionada
     setSelectedPurchase(purchase);
     setIsModalOpen(true);
   };
 
-  const handleChangeStatus = async (newStatus: string) => {
+  const handleChangeStatus = async (newStatus) => {
     if (!selectedPurchase) return;
 
     setPurchases(prev => prev.map(p =>
@@ -106,9 +109,10 @@ export default function PurchasesAdminPage() {
         headers: { 'Cache-Control': 'no-cache' }
       });
       const data = await res.json();
+      console.log("Datos actualizados:", data); // Verifica los datos actualizados
       setPurchases(data.purchases);
     } catch (error) {
-      console.error('Error updating purchase status:', error);
+      console.error('Error al actualizar el estado:', error);
       setPurchases(prev => prev.map(p =>
         p.id === selectedPurchase?.id ? { ...p, status: selectedPurchase?.status } : p
       ));
@@ -117,7 +121,7 @@ export default function PurchasesAdminPage() {
 
   const totalPages = Math.ceil(totalItems / itemsPerPage);
 
-  const renderPurchasesTable = (purchases: Purchase[]) => {
+  const renderPurchasesTable = (purchases) => {
     if (purchases.length === 0) {
       return (
         <div className="text-center py-8">
@@ -140,6 +144,7 @@ export default function PurchasesAdminPage() {
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">
           {purchases.map((purchase) => {
+            console.log("Datos de compra en render:", purchase); // Verifica cada compra en el render
             const validItems = Array.isArray(purchase.products)
               ? purchase.products
               : typeof purchase.products === 'string'
@@ -148,15 +153,17 @@ export default function PurchasesAdminPage() {
 
             const userNameOrEmail = purchase.buyer_name || purchase.user_email || '-';
             const productTitle = validItems.length > 0
-              ? validItems.map((item: PurchaseItem) => item.title || item.name).join(', ')
+              ? validItems.map((item) => item.title || item.name).join(', ')
               : purchase.description || 'Sin descripción';
 
             const date = new Date(Number(purchase.created_at));
-            const formattedDate = !isNaN(date.getTime()) ? date.toLocaleDateString('es-ES', {
-              year: 'numeric',
-              month: 'long',
-              day: 'numeric'
-            }) : 'Fecha inválida';
+            const formattedDate = !isNaN(date.getTime())
+              ? date.toLocaleDateString('es-ES', {
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric'
+                })
+              : 'Fecha inválida';
 
             const total = typeof purchase.total === 'number'
               ? purchase.total.toFixed(2)
