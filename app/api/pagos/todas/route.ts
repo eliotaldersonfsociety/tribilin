@@ -4,7 +4,7 @@ import { db } from '@/lib/epayco/db';
 import { epaycoOrders, epaycoOrderItems } from '@/lib/epayco/schema';
 import { eq, sql } from 'drizzle-orm'; // Asegúrate de importar `sql`
 
-export async function POST(request: Request) {
+export async function GET(request: Request) {
   try {
     const { page = 1, limit = 10, type = 'saldo' } = await request.json();
     const offset = (page - 1) * limit;
