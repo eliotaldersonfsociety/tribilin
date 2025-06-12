@@ -114,7 +114,7 @@ useEffect(() => {
 
   // Hacer fetch
   fetch('/api/balance', {
-    method: 'POST',
+    method: 'GET',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ userId: user.id }),
   })
