@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { epaycoOrders, epaycoOrderItems } from '@/lib/schema';
+import { epaycoOrders, epaycoOrderItems } from '@/lib/epayco/schema';
 import { and, desc, eq, sql } from 'drizzle-orm';
 
 export async function GET(req: Request) {
