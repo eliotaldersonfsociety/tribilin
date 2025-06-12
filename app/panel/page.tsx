@@ -116,20 +116,24 @@ useEffect(() => {
   fetch('/api/balance', {
     method: 'GET',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ userId: user.id }),
   })
-    .then(response => response.json())
-    .then(data => {
-      if (data.saldo !== undefined) {
-        setSaldo(data.saldo);
-        if (typeof window !== "undefined") {
-          localStorage.setItem('dashboard_saldo', data.saldo.toString());
-        }
+    .then(response => {
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+    return response.json();
+  })
+  .then(data => {
+    if (data.totalAmount !== undefined) {
+      setSaldo(data.totalAmount);
+      if (typeof window !== "undefined") {
+        localStorage.setItem('dashboard_saldo', data.totalAmount.toString());
       }
-    })
-    .catch(error => {
-      console.error('Error al obtener el saldo:', error);
-    });
+    }
+  })
+  .catch(error => {
+    console.error('Error al obtener el saldo:', error);
+  });
 }, [user]);
   console.log('Before memo calculations');
   const name = user?.firstName || '';
