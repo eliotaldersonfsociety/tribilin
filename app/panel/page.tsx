@@ -100,7 +100,8 @@ useEffect(() => {
       console.error('Error al obtener el número de productos favoritos:', error);
     });
 }, [user]);
-      useEffect(() => {
+      
+  useEffect(() => {
   if (!user || !user.publicMetadata?.isAdmin) return;
 
   // Cargar de localStorage
@@ -110,6 +111,26 @@ useEffect(() => {
       setSaldo(Number(localSaldo));
     }
   }
+    fetch('/api/balance', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId: user.id }),
+    })
+      .then(response => response.json())
+      .then(data => {
+        if (data.saldo !== undefined) {
+          setSaldo(data.saldo);
+          if (typeof window !== "undefined") {
+            localStorage.setItem('dashboard_saldo', data.saldo.toString());
+          }
+        }
+      })
+      .catch(error => {
+        console.error('Error al obtener el saldo:', error);
+      });
+
+    // Other fetch calls or logic...
+  }, [user]);
 
   // Hacer fetch
   fetch('/api/balance', {
