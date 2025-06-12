@@ -2,7 +2,7 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/epayco/db';
 import { epaycoOrders, epaycoOrderItems } from '@/lib/epayco/schema';
-import { eq } from 'drizzle-orm';
+import { eq, sql } from 'drizzle-orm'; // Asegúrate de importar `sql`
 
 export async function POST(request: Request) {
   try {
