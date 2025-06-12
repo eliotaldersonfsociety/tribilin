@@ -121,86 +121,85 @@ export default function PurchasesAdminPage() {
 
   const totalPages = Math.ceil(totalItems / itemsPerPage);
 
-  const renderPurchasesTable = (purchases: Purchase[]) => {
-    if (purchases.length === 0) {
-      return (
-        <div className="text-center py-8">
-          <p className="text-gray-500">No hay compras registradas.</p>
-        </div>
-      );
-    }
-
+  const renderPurchasesTable = (purchases) => {
+  if (purchases.length === 0) {
     return (
-      <table className="min-w-full divide-y divide-gray-200">
-        <thead className="bg-gray-50">
-          <tr>
-            <th>Usuario</th>
-            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
-            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Producto</th>
-            <th className="hidden sm:table-cell px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha</th>
-            <th className="hidden sm:table-cell px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
-            <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
-          </tr>
-        </thead>
-        <tbody className="bg-white divide-y divide-gray-200">
-          {purchases.map((purchase) => {
-            const validItems = Array.isArray(purchase.products)
-              ? purchase.products
-              : typeof purchase.products === 'string'
-                ? JSON.parse(purchase.products)
-                : [];
-
-            const userNameOrEmail = purchase.buyer_name || purchase.user_email || '-';
-            const productTitle = validItems.length > 0
-              ? validItems.map((item: PurchaseItem) => item.title || item.name).join(', ')
-              : purchase.description || 'Sin descripción';
-
-            const date = new Date(Number(purchase.created_at));
-            const formattedDate = !isNaN(date.getTime())
-              ? date.toLocaleDateString('es-ES', {
-                  year: 'numeric',
-                  month: 'long',
-                  day: 'numeric'
-                })
-              : 'Fecha inválida';
-
-            const total = typeof purchase.total === 'number'
-              ? purchase.total.toFixed(2)
-              : parseFloat(purchase.total || '0').toFixed(2);
-
-            return (
-              <tr
-                key={`${purchase.referenceCode || purchase.id}_${purchase.status}_${purchase.updated_at}`}
-                onClick={() => handleRowClick(purchase)}
-                className="hover:bg-gray-50 cursor-pointer transition-colors"
-              >
-                <td>{userNameOrEmail}</td>
-                <td className="px-4 py-3 text-xs sm:text-sm whitespace-nowrap">
-                  {`#${purchase.id}`}
-                </td>
-                <td className="px-4 py-3 text-xs sm:text-sm">
-                  <div className="line-clamp-2">
-                    {productTitle}
-                  </div>
-                </td>
-                <td className="hidden sm:table-cell px-4 py-3 text-xs sm:text-sm whitespace-nowrap">
-                  {formattedDate}
-                </td>
-                <td className="hidden sm:table-cell px-4 py-3 text-xs sm:text-sm">
-                  <Badge>
-                    {purchase.status || 'Pendiente'}
-                  </Badge>
-                </td>
-                <td className="px-4 py-3 text-right text-xs sm:text-sm whitespace-nowrap">
-                  ${total}
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
+      <div className="text-center py-8">
+        <p className="text-gray-500">No hay compras registradas.</p>
+      </div>
     );
-  };
+  }
+
+  return (
+    <table className="min-w-full divide-y divide-gray-200">
+      <thead className="bg-gray-50">
+        <tr>
+          <th>Usuario</th>
+          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Producto</th>
+          <th className="hidden sm:table-cell px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha</th>
+          <th className="hidden sm:table-cell px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
+          <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
+        </tr>
+      </thead>
+      <tbody className="bg-white divide-y divide-gray-200">
+        {purchases.map((purchase) => {
+          const validItems = Array.isArray(purchase.items)
+            ? purchase.items
+            : [];
+
+          const userNameOrEmail = purchase.buyer_name || purchase.buyerEmail || '-';
+          const productTitle = validItems.length > 0
+            ? validItems.map((item) => item.title || item.name).join(', ')
+            : purchase.description || 'Sin descripción';
+
+          const date = new Date(Number(purchase.processingDate));
+          const formattedDate = !isNaN(date.getTime())
+            ? date.toLocaleDateString('es-ES', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+              })
+            : 'Fecha inválida';
+
+          const total = typeof purchase.amount === 'number'
+            ? purchase.amount.toFixed(2)
+            : parseFloat(purchase.amount || '0').toFixed(2);
+
+          return (
+            <tr
+              key={`${purchase.referenceCode || purchase.id}_${purchase.status}_${purchase.processingDate}`}
+              onClick={() => handleRowClick(purchase)}
+              className="hover:bg-gray-50 cursor-pointer transition-colors"
+            >
+              <td>{userNameOrEmail}</td>
+              <td className="px-4 py-3 text-xs sm:text-sm whitespace-nowrap">
+                {`#${purchase.id}`}
+              </td>
+              <td className="px-4 py-3 text-xs sm:text-sm">
+                <div className="line-clamp-2">
+                  {productTitle}
+                </div>
+              </td>
+              <td className="hidden sm:table-cell px-4 py-3 text-xs sm:text-sm whitespace-nowrap">
+                {formattedDate}
+              </td>
+              <td className="hidden sm:table-cell px-4 py-3 text-xs sm:text-sm">
+                <Badge>
+                  {purchase.status || 'Pendiente'}
+                </Badge>
+              </td>
+              <td className="px-4 py-3 text-right text-xs sm:text-sm whitespace-nowrap">
+                ${total}
+              </td>
+            </tr>
+          );
+        })}
+      </tbody>
+    </table>
+  );
+};
+
 
   return (
     <DashboardLayouts>
