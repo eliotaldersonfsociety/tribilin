@@ -49,26 +49,24 @@ export default function PurchasesAdminPage() {
   const itemsPerPage = 10;
   const [totalItems, setTotalItems] = useState({ saldo: 0, payu: 0 });
 
-  // Traer compras del backend SIEMPRE que cambie tab o página
-  useEffect(() => {
-    const fetchPurchases = async () => {
-      setLoading(true);
-      try {
-        const type = activeTab;
-        const page = activeTab === 'payu' ? currentPagePayu : currentPageSaldo;
-        const res = await fetch(`/api/pagos/todas?page=${page}&type=${type}&timestamp=${Date.now()}`, {
-          headers: { 'Cache-Control': 'no-cache' }
-        });
-        const data = await res.json();
-        setPurchases(Array.isArray(data.purchases) ? [...data.purchases] : []);
-        setTotalItems((prev) => ({ ...prev, [type]: data.pagination?.total || 0 }));
-      } catch (error) {
-        setPurchases([]);
-      }
-      setLoading(false);
-    };
-    fetchPurchases();
-  }, [activeTab, currentPagePayu, currentPageSaldo]);
+  const fetchPurchases = async () => {
+  setLoading(true);
+  try {
+    const type = activeTab;
+    const page = activeTab === 'payu' ? currentPagePayu : currentPageSaldo;
+    const res = await fetch(`/api/pagos/todas?page=${page}&type=${type}&timestamp=${Date.now()}`, {
+      headers: { 'Cache-Control': 'no-cache' }
+    });
+    const data = await res.json();
+    setPurchases(Array.isArray(data.purchases) ? [...data.purchases] : []);
+    setTotalItems((prev) => ({ ...prev, [type]: data.pagination?.total || 0 }));
+  } catch (error) {
+    console.error('Error fetching purchases:', error);
+    setPurchases([]);
+  }
+  setLoading(false);
+};
+
 
   // Refrescar manualmente
   const handleRefresh = async () => {
