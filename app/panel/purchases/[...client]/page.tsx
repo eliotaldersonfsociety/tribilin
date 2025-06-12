@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge"
 interface PurchaseItem {
   id?: number;
   name: string;
+  title?: string;
   price: number;
   quantity: number;
   image?: string;
@@ -22,7 +23,7 @@ interface Purchase {
   id: string | number;
   referenceCode?: string;
   description: string;
-  total: number;
+  total: number | string;
   updated_at: number | string;
   created_at: number | string;
   products: string | PurchaseItem[];
@@ -30,6 +31,7 @@ interface Purchase {
   status?: string;
   user_id?: string;
   user_email?: string;
+  buyer_name?: string;
 }
 
 export default function PurchasesAdminPage() {
@@ -143,29 +145,40 @@ export default function PurchasesAdminPage() {
               : typeof purchase.products === 'string'
                 ? JSON.parse(purchase.products)
                 : [];
+
+            const userNameOrEmail = purchase.buyer_name || purchase.user_email || '-';
+            const productTitle = validItems.length > 0
+              ? validItems.map((item: PurchaseItem) => item.title || item.name).join(', ')
+              : purchase.description || 'Sin descripción';
+
+            const date = new Date(Number(purchase.created_at));
+            const formattedDate = !isNaN(date.getTime()) ? date.toLocaleDateString('es-ES', {
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric'
+            }) : 'Fecha inválida';
+
+            const total = typeof purchase.total === 'number'
+              ? purchase.total.toFixed(2)
+              : parseFloat(purchase.total || '0').toFixed(2);
+
             return (
               <tr
                 key={`${purchase.referenceCode || purchase.id}_${purchase.status}_${purchase.updated_at}`}
                 onClick={() => handleRowClick(purchase)}
                 className="hover:bg-gray-50 cursor-pointer transition-colors"
               >
-                <td>{purchase.user_email || '-'}</td>
+                <td>{userNameOrEmail}</td>
                 <td className="px-4 py-3 text-xs sm:text-sm whitespace-nowrap">
                   {`#${purchase.id}`}
                 </td>
                 <td className="px-4 py-3 text-xs sm:text-sm">
                   <div className="line-clamp-2">
-                    {validItems.length > 0
-                      ? validItems.map((item: any) => item.name).join(', ')
-                      : purchase.description || 'Sin descripción'}
+                    {productTitle}
                   </div>
                 </td>
                 <td className="hidden sm:table-cell px-4 py-3 text-xs sm:text-sm whitespace-nowrap">
-                  {new Date(Number(purchase.created_at)).toLocaleDateString('es-ES', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric'
-                  })}
+                  {formattedDate}
                 </td>
                 <td className="hidden sm:table-cell px-4 py-3 text-xs sm:text-sm">
                   <Badge>
@@ -173,9 +186,7 @@ export default function PurchasesAdminPage() {
                   </Badge>
                 </td>
                 <td className="px-4 py-3 text-right text-xs sm:text-sm whitespace-nowrap">
-                  ${typeof purchase.total === 'number'
-                    ? purchase.total.toFixed(2)
-                    : parseFloat(purchase.total || '0').toFixed(2)}
+                  ${total}
                 </td>
               </tr>
             );
