@@ -37,7 +37,6 @@ export async function GET(request: Request) {
         items: sql<PurchaseItem[]>`json_agg(
           json_build_object(
             'id', ${epaycoOrderItems.id},
-            'name', ${epaycoOrderItems.name},
             'title', ${epaycoOrderItems.title},
             'price', ${epaycoOrderItems.price},
             'quantity', ${epaycoOrderItems.quantity},
