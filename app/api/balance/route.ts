@@ -1,33 +1,27 @@
-import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
-import db from "@/lib/db";
-import { users } from "@/lib/usuarios/schema";
-import { eq } from "drizzle-orm";
+// app/api/pagos/saldo/route.ts
+import { NextResponse } from 'next/server';
+import { db } from '@/lib/epayco/db';
+import { epaycoOrders } from '@/lib/epayco/schema';
+import { sql } from 'drizzle-orm';
 
-async function consultarSaldo(clerkId: string): Promise<number> {
-  const result = await db.users
-    .select({ saldoText: users.saldo })
-    .from(users)
-    .where(eq(users.clerk_id, clerkId));
-
-  if (!result || result.length === 0) return 0;
-
-  const saldoNum = parseFloat(result[0].saldoText ?? "0");
-  return isNaN(saldoNum) ? 0 : saldoNum;
-}
-
-export async function POST(req: NextRequest) {
-  const { userId } = await auth();
-
-  if (!userId) {
-    return NextResponse.json({ message: "No autorizado" }, { status: 401 });
-  }
-
+export async function GET() {
   try {
-    const saldo = await consultarSaldo(userId);
-    return NextResponse.json({ saldo });
-  } catch (err) {
-    console.error("[BALANCE] Error:", err);
-    return NextResponse.json({ message: "Error al consultar saldo" }, { status: 500 });
+    // Use SQL to sum the amount column
+    const [result] = await db
+      .select({
+        totalAmount: sql<number>`SUM(amount)`, // Sum all the amounts
+      })
+      .from(epaycoOrders);
+
+    // Return the total amount as the balance
+    return NextResponse.json({
+      totalAmount: result.totalAmount || 0, // Return 0 if there are no records
+    });
+  } catch (error) {
+    console.error('Error al calcular el saldo total:', error);
+    return NextResponse.json(
+      { error: 'Error al calcular el saldo total' },
+      { status: 500 }
+    );
   }
 }
