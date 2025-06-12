@@ -15,7 +15,7 @@ export async function GET(req: Request) {
     const total = totalResult[0]?.count || 0;
 
     // Consulta principal con inner join y JSON agregando los items
-    const purchases = await db
+    const purchases = await db.epayco
       .select({
         id: epaycoOrders.id,
         referenceCode: epaycoOrders.referenceCode,
